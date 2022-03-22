@@ -27,7 +27,7 @@ CREATE TABLE "posts" (
 	"link" TEXT NOT NULL,
 	"text" TEXT NOT NULL,
 	"authorId" integer NOT NULL,
-	"time" TIMESTAMP NOT NULL,
+	"time" TIMESTAMP NOT NULL DEFAULT NOW(),
 	CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
