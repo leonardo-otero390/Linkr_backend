@@ -5,6 +5,6 @@ import validateAuth from '../middlewares/authValidationMiddleware.js';
 
 const sessionRouter = Router();
 
-sessionRouter.post('/auth/logout', validateAuth, finishSession);
+sessionRouter.delete('/sessions', validateAuth, finishSession);
 
 export default sessionRouter;
