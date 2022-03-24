@@ -1,5 +1,5 @@
 import { validate as uuidValidate } from 'uuid';
-import db from '../database/connection.js';
+import * as sessionRepository from '../repositories/sessionRepository.js';
 
 export default async function validateToken(req, res, next) {
   const { authorization } = req.headers;
@@ -16,9 +16,9 @@ export default async function validateToken(req, res, next) {
   if (!uuidValidate(token)) return res.sendStatus(400);
 
   try {
-    const thisTokenUser = await db.collection('sessions').findOne({ token });
-    if (!thisTokenUser) return res.sendStatus(401);
-    res.locals.userId = thisTokenUser.userId;
+    const {userId} = await sessionRepository.find(token);
+    if (!userId) return res.sendStatus(401);
+    res.locals.userId = userId;
   } catch (err) {
     console.log(err);
     return res.sendStatus(500);

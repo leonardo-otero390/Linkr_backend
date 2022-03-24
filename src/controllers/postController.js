@@ -10,15 +10,18 @@ function extractHashtags(text) {
 }
 async function handleHashtags(text, postId) {
   const hashtags = extractHashtags(text);
-  const hashtagsInDb = await hashtagRepository.findManyByName(hashtags);
-  const hashtagsNotInDb = hashtags.filter(
-    (hashtag) => !hashtagsInDb.find((h) => h.name === hashtag)
-  );
+  const hashtagsInDb = await hashtagRepository.findManyByName(hashtags) || [];
+  let hashtagsNotInDb = hashtags;
+  if (hashtagsInDb.length) {
+    hashtagsNotInDb = hashtags.filter(
+      (hashtag) => !hashtagsInDb.find((h) => h.name === hashtag)
+    );
+  }
   let newHashtagsIds = [];
   if (hashtagsNotInDb.length) {
     newHashtagsIds = await hashtagRepository.insertMany(hashtagsNotInDb);
   }
-  newHashtagsIds.forEach((id) => hashtagsInDb.push(id));
+  newHashtagsIds.forEach((id) => hashtagsInDb.push({id}));
   const hashtagsIds = hashtagsInDb.map((h) => h.id);
   await hashtagPostRepository.insertMany({ postId, hashtagsIds });
   return hashtagsIds;
@@ -37,9 +40,11 @@ export async function create(req, res) {
       description,
       image,
     });
-    delete post.authorId;
     await handleHashtags(text, post.id);
+    delete post.authorId;
+    
     const user = await userRepository.find(userId);
+    delete user.password;
     return res.status(201).send({ post, user, like: [] });
   } catch (error) {
     console.error(error.message);
