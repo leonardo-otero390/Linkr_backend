@@ -36,6 +36,7 @@ export async function create(req, res) {
       description,
       image,
     });
+    delete post.authorId;
     await handleHashtags(text, post.id);
     return res.status(201).send({ post, user, like: [] });
   } catch (error) {
