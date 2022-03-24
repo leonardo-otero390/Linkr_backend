@@ -2,6 +2,7 @@ import urlMetadata from 'url-metadata';
 import * as postRepository from '../repositories/postRepository.js';
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
+import userRepository from '../repositories/userRepository.js';
 
 function extractHashtags(text) {
   const hashtags = text.match(/#\w+/g);
@@ -23,7 +24,7 @@ async function handleHashtags(text, postId) {
   return hashtagsIds;
 }
 export async function create(req, res) {
-  const { user } = res.locals;
+  const { userId } = res.locals;
   const { text, link } = req.body;
 
   try {
@@ -31,13 +32,14 @@ export async function create(req, res) {
     const post = await postRepository.insert({
       text,
       link,
-      userId: user.id,
+      userId,
       title,
       description,
       image,
     });
     delete post.authorId;
     await handleHashtags(text, post.id);
+    const user = await userRepository.find(userId);
     return res.status(201).send({ post, user, like: [] });
   } catch (error) {
     console.error(error.message);

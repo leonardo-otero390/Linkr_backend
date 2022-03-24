@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import validateSchemaMiddleware from '../middlewares/validateSchemaMiddleware.js';
+import validateSchema from '../middlewares/schemaValidationMiddleware.js';
 import * as postSchemas from '../schemas/postSchemas.js';
 import * as postController from '../controllers/postController.js';
 
@@ -7,7 +7,7 @@ const routes = new Router();
 
 routes.post(
   '/',
-  validateSchemaMiddleware(postSchemas.newPost),
+  validateSchema(postSchemas.newPost),
   postController.create
 );
 
