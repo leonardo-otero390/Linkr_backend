@@ -21,7 +21,7 @@ async function handleHashtags(text, postId) {
   if (hashtagsNotInDb.length) {
     newHashtagsIds = await hashtagRepository.insertMany(hashtagsNotInDb);
   }
-  newHashtagsIds.forEach((id) => hashtagsInDb.push({id}));
+  newHashtagsIds.forEach((id) => hashtagsInDb.push(id));
   const hashtagsIds = hashtagsInDb.map((h) => h.id);
   await hashtagPostRepository.insertMany({ postId, hashtagsIds });
   return hashtagsIds;
