@@ -22,7 +22,6 @@ export async function GetPosts(req, res) {
     });
 
     res.send(all);
-    //res.sendStatus(404);
   } catch (err) {
     res.status(500).send(err.message);
   }
