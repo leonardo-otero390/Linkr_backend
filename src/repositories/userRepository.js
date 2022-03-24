@@ -11,6 +11,13 @@ async function getUserByEmail(email) {
   return connection.query(`SELECT * FROM users WHERE email=$1`, [email]);
 }
 
-const userRepository = { insertUser, getUserByEmail };
+async function createSession(sessionData) {
+  return connection.query(`
+    INSERT INTO sessions 
+    ("userId", token) VALUES ($1, $2)
+  `, [sessionData.userId, sessionData.token]);
+}
+
+const userRepository = { insertUser, getUserByEmail, createSession };
 
 export default userRepository;
