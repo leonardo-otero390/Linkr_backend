@@ -11,13 +11,14 @@ async function getUserByEmail(email) {
   return connection.query(`SELECT * FROM users WHERE email=$1`, [email]);
 }
 
-async function createSession(sessionData) {
-  return connection.query(`
-    INSERT INTO sessions 
-    ("userId", token) VALUES ($1, $2)
-  `, [sessionData.userId, sessionData.token]);
+async function find(id) {
+  const result = await connection.query(`SELECT * FROM users WHERE id=$1`, [
+    id,
+  ]);
+  if (!result.rowCount) return null;
+  return result.rows[0];
 }
 
-const userRepository = { insertUser, getUserByEmail, createSession };
+const userRepository = { find,insertUser, getUserByEmail };
 
 export default userRepository;

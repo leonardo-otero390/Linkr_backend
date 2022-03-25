@@ -25,9 +25,12 @@ CREATE TABLE "sessions" (
 CREATE TABLE "posts" (
 	"id" serial NOT NULL,
 	"link" TEXT NOT NULL,
+	"linkTitle" TEXT NOT NULL,
+	"linkDescription" TEXT NOT NULL,
+	"linkImage" TEXT NOT NULL,
 	"text" TEXT NOT NULL,
 	"authorId" integer NOT NULL,
-	"time" TIMESTAMP NOT NULL,
+	"time" TIMESTAMP NOT NULL DEFAULT NOW(),
 	CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
