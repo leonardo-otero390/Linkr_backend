@@ -10,7 +10,7 @@ export default async function validateAuth(req, res, next) {
 
   try {
     const sessionResult = await sessionRepository.getSession(token);
-    const [session] = sessionResult;
+    const [session] = sessionResult.rows;
 
     if (!session) {
       return res.status(401).send('Você não está autorizado!');

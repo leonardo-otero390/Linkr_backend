@@ -47,7 +47,6 @@ export async function create(req, res) {
     delete user.password;
     return res.status(201).send({ post, user, like: [] });
   } catch (error) {
-    console.error(error.message);
     return res.sendStatus(500);
   }
 }
