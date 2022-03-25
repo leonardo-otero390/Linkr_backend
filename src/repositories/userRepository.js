@@ -11,6 +11,12 @@ async function getUserByEmail(email) {
   return connection.query(`SELECT * FROM users WHERE email=$1`, [email]);
 }
 
-const userRepository = { insertUser, getUserByEmail };
+async function getUserByName(name) {
+  return connection.query(`SELECT * FROM users WHERE name LIKE $1`, [
+    name + '%',
+  ]);
+}
+
+const userRepository = { insertUser, getUserByEmail, getUserByName };
 
 export default userRepository;

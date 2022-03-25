@@ -57,8 +57,8 @@ export async function getPostsId(req, res) {
       return array;
     });
 
-    res.send(all);
+    return res.send(all);
   } catch (err) {
-    res.status(500).send(err.message);
+    return res.status(500).send(err.message);
   }
 }
