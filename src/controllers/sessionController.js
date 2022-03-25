@@ -51,5 +51,5 @@ export async function createSession(req, res) {
   } catch (error) {
     res.status(500).send('There was an internal server error');
   }
-  return 1;
+  return 2;
 }
