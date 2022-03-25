@@ -9,10 +9,13 @@ async function getSession(token) {
 }
 
 async function createSession(sessionData) {
-  return connection.query(`
+  return connection.query(
+    `
     INSERT INTO sessions 
     ("userId", token) VALUES ($1, $2)
-  `, [sessionData.userId, sessionData.token]);
+  `,
+    [sessionData.userId, sessionData.token]
+  );
 }
 
 const sessionRepository = { deleteSession, getSession, createSession };
