@@ -35,6 +35,6 @@ export async function getUserByName(req, res) {
 
     res.send(users.rows);
   } catch (error) {
-    res.status(500).send('There was an internal server error');
+    res.status(500).send(error.mesage);
   }
 }
