@@ -12,9 +12,8 @@ async function getUserByEmail(email) {
 }
 
 async function getUserByName(name) {
-  return connection.query(`SELECT * FROM users WHERE name LIKE $1`, [
-    name + '%',
-  ]);
+  const search = `${name}%`;
+  return connection.query(`SELECT * FROM users WHERE name LIKE $1`, [search]);
 }
 
 const userRepository = { insertUser, getUserByEmail, getUserByName };

@@ -26,11 +26,12 @@ export async function createUser(req, res) {
   }
 }
 
-export async function getUserName(req, res) {
+export async function getUserByName(req, res) {
   try {
     const { name } = req.body;
 
     const users = await userRepository.getUserByName(name);
+    console.log(name);
 
     res.send(users.rows);
   } catch (error) {
