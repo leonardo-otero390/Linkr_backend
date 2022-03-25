@@ -20,7 +20,6 @@ export default async function validateAuth(req, res, next) {
 
     return next();
   } catch (error) {
-    console.error(error);
     return res.status(500).send('There was an internal server error');
   }
 }
