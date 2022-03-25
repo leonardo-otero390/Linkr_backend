@@ -22,7 +22,6 @@ export async function createUser(req, res) {
 
     res.sendStatus(201);
   } catch (error) {
-    console.error(error);
     res.status(500).send('There was an internal server error');
   }
 }
