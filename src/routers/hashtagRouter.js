@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import validateAuth from '../middlewares/authValidationMiddleware';
-import * as hashtagController from '../controllers/hashtagController';
+import validateAuth from '../middlewares/authValidationMiddleware.js';
+import * as hashtagController from '../controllers/hashtagController.js';
 
 const routes = new Router();
 
