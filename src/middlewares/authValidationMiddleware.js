@@ -5,7 +5,7 @@ export default async function validateAuth(req, res, next) {
   const token = authorization?.replace('Bearer ', '');
 
   if (!token) {
-    return res.status(401).send('Você não está autorizado!');
+    return res.status(401).send('You are not allowed!');
   }
 
   try {
@@ -13,7 +13,7 @@ export default async function validateAuth(req, res, next) {
     const [session] = sessionResult.rows;
 
     if (!session) {
-      return res.status(401).send('Você não está autorizado!');
+      return res.status(401).send('You are not allowed!');
     }
 
     res.locals.userId = session.userId;
