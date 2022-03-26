@@ -28,7 +28,6 @@ describe('GET /hashtags/trending', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(204);
-    expect(response.body).toMatchObject({});
   });
   it('should return 200 and a body', async () => {
     await createManyPosts(token);
