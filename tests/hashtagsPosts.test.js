@@ -21,10 +21,10 @@ afterAll(async () => {
   await databaseUtil.clearDatabase();
 });
 
-describe('GET /hashtags/trending', () => {
+describe('GET /hashtags/HASHTAG/posts', () => {
   it('should return 204', async () => {
     const response = await agent
-      .get('/hashtags/trending')
+      .get('/hashtags/teste/posts')
       .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).toBe(204);
@@ -33,10 +33,20 @@ describe('GET /hashtags/trending', () => {
   it('should return 200 and a body', async () => {
     await createManyPosts(token);
     const response = await agent
-      .get('/hashtags/trending')
+      .get('/hashtags/Top1/posts')
       .set('Authorization', `Bearer ${token}`);
-    const keys = Object.keys(response.body[0]);
+    const keys = Object.keys(response.body[0].posts[0]);
+    const postKeys = [
+      'id',
+      'text',
+      'link',
+      'linkTitle',
+      'linkDescription',
+      'linkImage',
+      'user',
+      'likes',
+    ];
     expect(response.status).toBe(200);
-    expect(keys).toStrictEqual(['count', 'name', 'id']);
+    expect(keys).toStrictEqual(postKeys);
   });
 });
