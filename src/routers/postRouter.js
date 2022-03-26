@@ -16,4 +16,6 @@ routes.post(
   postController.create
 );
 
+routes.delete('/:id', validateAuth, postController.remove);
+
 export default routes;

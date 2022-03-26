@@ -50,3 +50,28 @@ export async function create(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function remove(req, res) {
+  try {
+    const { id } = req.params;
+  
+    const { userId } = res.locals;
+  
+    const postToDelete = await postRepository.get(id);
+  
+    if(!postToDelete) {
+      return res.status(422).send('There is no post with this id');
+    }
+  
+    if(postToDelete.authorId !== userId) {
+      return res.status(401).send('This post is not yours');
+    }
+  
+    await postRepository.remove(id);
+  
+    return res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send('There was an internal server error');
+  }
+}
