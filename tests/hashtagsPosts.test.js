@@ -9,6 +9,7 @@ const agent = supertest(app);
 let token;
 
 beforeAll(async () => {
+  await databaseUtil.clearDatabase();
   const user = await usersFactory.createUser();
   const auth = await sessionsFactory.logIn({
     email: user.email,
@@ -17,9 +18,7 @@ beforeAll(async () => {
   token = auth.token;
 });
 
-afterAll(async () => {
-  await databaseUtil.clearDatabase();
-});
+afterAll(() => databaseUtil.closeConnection());
 
 describe('GET /hashtags/HASHTAG/posts', () => {
   it('should return 204', async () => {
