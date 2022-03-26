@@ -31,10 +31,9 @@ export async function getUserByName(req, res) {
     const { name } = req.body;
 
     const users = await userRepository.getUserByName(name);
-    console.log(name);
 
     res.send(users.rows);
   } catch (error) {
-    res.status(500).send(error.mesage);
+    res.status(500).send(error.message);
   }
 }

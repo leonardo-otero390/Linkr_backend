@@ -9,7 +9,7 @@ const PostsRoute = new Router();
 PostsRoute.get('/posts', getPosts);
 PostsRoute.get('/posts/:id', getPostsById);
 PostsRoute.post(
-  '/',
+  '/posts',
   validateSchema(postSchemas.newPost),
   postController.create
 );
