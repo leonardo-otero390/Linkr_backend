@@ -36,9 +36,9 @@ export async function create(req, res) {
       text,
       link,
       userId,
-      title,
-      description,
-      image,
+      title:title || "Link doesn't have a title",
+      description: description || "Link doesn't have a description",
+      image: image || "https://http.cat/404",
     });
     await handleHashtags(text, post.id);
     delete post.authorId;
