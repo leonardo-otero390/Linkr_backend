@@ -9,3 +9,16 @@ export async function insertMany({ postId, hashtagsIds }) {
   if (!result.rowCount) return false;
   return true;
 }
+
+export async function findPostsByHashtag(name) {
+  const result = await connection.query(
+    `SELECT *,users.name as username FROM "posts"
+    JOIN "hashtagsPosts" ON "posts"."id" = "hashtagsPosts"."postId"
+    JOIN "hashtags" ON "hashtags"."id" = "hashtagsPosts"."hashtagId"
+    JOIN users ON users.id = posts."authorId"
+    WHERE "hashtags"."name" = $1;`,
+    [name]
+    );
+  if (!result.rowCount) return false;
+  return result.rows;
+}

@@ -33,9 +33,9 @@ describe('GET /hashtags/HASHTAG/posts', () => {
   it('should return 200 and a body', async () => {
     await createManyPosts(token);
     const response = await agent
-      .get('/hashtags/Top1/posts')
+      .get('/hashtags/top1/posts')
       .set('Authorization', `Bearer ${token}`);
-    const keys = Object.keys(response.body[0].posts[0]);
+    const keys = Object.keys(response.body[0]);
     const postKeys = [
       'id',
       'text',
