@@ -10,6 +10,9 @@ function extractHashtags(text) {
 }
 async function handleHashtags(text, postId) {
   const hashtags = extractHashtags(text);
+  if (hashtags.length === 0) {
+    return 0
+  }
   const hashtagsInDb = await hashtagRepository.findManyByName(hashtags) || [];
   let hashtagsNotInDb = hashtags;
   if (hashtagsInDb.length) {
