@@ -18,7 +18,17 @@ export async function findPostsByHashtag(name) {
     JOIN users ON users.id = posts."authorId"
     WHERE "hashtags"."name" = $1;`,
     [name]
-    );
+  );
+  if (!result.rowCount) return false;
+  return result.rows;
+}
+
+export async function findHashtagsNamesByPostsIds(ids) {
+  const result = await connection.query(
+    `SELECT hashtags.name FROM "hashtags"
+    JOIN "hashtagsPosts" ON "hashtags"."id" = "hashtagsPosts"."hashtagId"
+    WHERE "hashtagsPosts"."postId" IN(${ids});`
+  );
   if (!result.rowCount) return false;
   return result.rows;
 }

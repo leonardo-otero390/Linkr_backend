@@ -13,8 +13,19 @@ async function insertLikesInPostArray(posts) {
   });
 }
 
+async function insertHashtagsInPostArray(posts){
+  const postsIds = posts.map((post) => post.id);
+  const hashtags = await hashtagPostRepository.findHashtagsNamesByPostsIds(postsIds);
+  if(!hashtags) return posts;
+  return posts.map((post) => {
+    const thisPosthashtags = hashtags.filter((hashtag) => hashtag.postId === post.id);
+
+    return { ...post, hashtags: thisPosthashtags };
+  });
+}
+
 async function organizePostObjects(posts) {
-  const arr = posts.map((post) => {
+  let arr = await posts.map((post) => {
     const object = {
       id: post.postId,
       text: post.text,
@@ -22,22 +33,23 @@ async function organizePostObjects(posts) {
       linkTitle: post.linkTitle,
       linkDescription: post.linkDescription,
       linkImage: post.linkImage,
-      user: {
-        id: post.authorId,
-        username: post.username,
-        avatar: post.pictureUrl,
-      },
+      authorId: post.authorId,
+      name: post.name,
+      pictureUrl: post.pictureUrl,
       likes: [],
+      hashtags:[],
     };
     return object;
   });
-  return insertLikesInPostArray(arr);
+  arr = await insertLikesInPostArray(arr);
+  arr = await insertHashtagsInPostArray(arr);
+  return arr;
 }
 
 export async function getTrending(req, res) {
   try {
     const trendingHashtags = await hashtagRepository.listTopHashtags(10);
-    if (!trendingHashtags) return res.status(204).send('No hashtags found');
+    if (!trendingHashtags) return res.status(200).send([]);
     return res.status(200).send(trendingHashtags);
   } catch (error) {
     return res.sendStatus(500);

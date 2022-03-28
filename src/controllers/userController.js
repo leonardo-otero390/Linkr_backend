@@ -25,3 +25,15 @@ export async function createUser(req, res) {
     res.status(500).send('There was an internal server error');
   }
 }
+
+export async function getUserByName(req, res) {
+  try {
+    const { name } = req.body;
+
+    const users = await userRepository.getUserByName(name);
+
+    res.send(users.rows);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}

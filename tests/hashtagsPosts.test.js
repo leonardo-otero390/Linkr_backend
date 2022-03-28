@@ -41,8 +41,11 @@ describe('GET /hashtags/HASHTAG/posts', () => {
       'linkTitle',
       'linkDescription',
       'linkImage',
-      'user',
+      'authorId',
+      'name',
+      'pictureUrl',
       'likes',
+      'hashtags',
     ];
     expect(response.status).toBe(200);
     expect(keys).toStrictEqual(postKeys);
