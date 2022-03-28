@@ -1,5 +1,7 @@
 import connection from '../../src/database/connection';
 
+export const closeConnection = () => connection.end();
+
 export async function clearDatabase() {
   try {
     await connection.query('DELETE FROM "hashtagsPosts"');

@@ -7,6 +7,7 @@ import { getPosts, getPostsById } from '../controllers/postController.js';
 
 const PostsRoute = new Router();
 
+
 PostsRoute.get('/posts', validateAuth, getPosts);
 PostsRoute.get('/posts/:id', validateAuth, getPostsById);
 PostsRoute.post(

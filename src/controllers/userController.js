@@ -28,7 +28,7 @@ export async function createUser(req, res) {
 
 export async function getUserByName(req, res) {
   try {
-    const { name } = req.body;
+    const { name } = req.query;
 
     const users = await userRepository.getUserByName(name);
 
