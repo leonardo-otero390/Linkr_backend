@@ -9,8 +9,11 @@ function extractHashtags(text) {
   const hashtags = text.match(/#\w+/g);
   return hashtags ? hashtags.map((hashtag) => hashtag.substring(1)) : [];
 }
+
 async function handleHashtags(text, postId) {
   const hashtags = extractHashtags(text);
+  if (!hashtags.length) return 0;
+
   const hashtagsInDb = (await hashtagRepository.findManyByName(hashtags)) || [];
   let hashtagsNotInDb = hashtags;
   if (hashtagsInDb.length) {
@@ -27,27 +30,35 @@ async function handleHashtags(text, postId) {
   await hashtagPostRepository.insertMany({ postId, hashtagsIds });
   return hashtagsIds;
 }
+
 export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
+  const existHashtag = text.includes('#');
+  const textSplit = text.split('#');
+  const notHashtagText = textSplit[0];
 
   try {
     const { title, description, image } = await urlMetadata(link);
+
     const post = await postRepository.insert({
-      text,
+      text: notHashtagText,
       link,
       userId,
-      title,
-      description,
-      image,
+      title: title || "Link doesn't have a title",
+      description: description || "Link doesn't have a description",
+      image: image || 'https://http.cat/404',
     });
-    await handleHashtags(text, post.id);
+
+    if (existHashtag) await handleHashtags(text, post.id);
+
     delete post.authorId;
 
     const user = await userRepository.find(userId);
     delete user.password;
     return res.status(201).send({ post, user, like: [] });
   } catch (error) {
+    console.log(error.message);
     return res.sendStatus(500);
   }
 }
