@@ -12,6 +12,8 @@ function extractHashtags(text) {
 
 async function handleHashtags(text, postId) {
   const hashtags = extractHashtags(text);
+  if (!hashtags.length) return 0;
+
   const hashtagsInDb = (await hashtagRepository.findManyByName(hashtags)) || [];
   let hashtagsNotInDb = hashtags;
   if (hashtagsInDb.length) {
@@ -43,9 +45,9 @@ export async function create(req, res) {
       text: notHashtagText,
       link,
       userId,
-      title:title || "Link doesn't have a title",
+      title: title || "Link doesn't have a title",
       description: description || "Link doesn't have a description",
-      image: image || "https://http.cat/404",
+      image: image || 'https://http.cat/404',
     });
 
     if (existHashtag) await handleHashtags(text, post.id);
