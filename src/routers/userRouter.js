@@ -7,6 +7,6 @@ import userSchema from '../schemas/userSchema.js';
 const userRouter = Router();
 
 userRouter.post('/users', validateSchema(userSchema), createUser);
-userRouter.get('/users/name', getUserByName);
+userRouter.post('/users/name', getUserByName);
 
 export default userRouter;

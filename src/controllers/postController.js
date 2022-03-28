@@ -9,6 +9,7 @@ function extractHashtags(text) {
   const hashtags = text.match(/#\w+/g);
   return hashtags ? hashtags.map((hashtag) => hashtag.substring(1)) : [];
 }
+
 async function handleHashtags(text, postId) {
   const hashtags = extractHashtags(text);
   const hashtagsInDb = (await hashtagRepository.findManyByName(hashtags)) || [];
@@ -27,21 +28,28 @@ async function handleHashtags(text, postId) {
   await hashtagPostRepository.insertMany({ postId, hashtagsIds });
   return hashtagsIds;
 }
+
 export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
+  const existHashtag = text.includes('#');
+  const textSplit = text.split('#');
+  const notHashtagText = textSplit[0];
 
   try {
     const { title, description, image } = await urlMetadata(link);
+
     const post = await postRepository.insert({
-      text,
+      text: notHashtagText,
       link,
       userId,
       title,
       description,
       image,
     });
-    await handleHashtags(text, post.id);
+
+    if (existHashtag) await handleHashtags(text, post.id);
+
     delete post.authorId;
 
     const user = await userRepository.find(userId);
