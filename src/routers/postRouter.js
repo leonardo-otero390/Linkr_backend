@@ -17,5 +17,6 @@ PostsRoute.post(
   postController.create
 );
 
+PostsRoute.delete('/posts/:id', validateAuth, postController.remove);
 
 export default PostsRoute;
