@@ -11,6 +11,11 @@ async function getUserByEmail(email) {
   return connection.query(`SELECT * FROM users WHERE email=$1`, [email]);
 }
 
+async function getUserByName(name) {
+  const search = `${name}%`;
+  return connection.query(`SELECT * FROM users WHERE name LIKE $1`, [search]);
+}
+
 async function find(id) {
   const result = await connection.query(`SELECT * FROM users WHERE id=$1`, [
     id,
@@ -19,6 +24,6 @@ async function find(id) {
   return result.rows[0];
 }
 
-const userRepository = { find,insertUser, getUserByEmail };
+const userRepository = { find, insertUser, getUserByEmail, getUserByName };
 
 export default userRepository;

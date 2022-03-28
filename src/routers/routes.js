@@ -9,8 +9,8 @@ const routes = new Router();
 routes.get('/health', async (req, res) => {
   res.sendStatus(200);
 });
-routes.use('/posts', postRouter);
-routes.use('/hashtags', hashtagRouter);
+routes.use(postRouter);
+routes.use(hashtagRouter);
 routes.use(userRouter);
 routes.use(sessionRouter);
 
