@@ -10,7 +10,7 @@ export async function findManyPostsIds(ids) {
 
 export async function toggle(userId, postId) {
   const isLikedResult = await connection.query(
-    `SELECT * FROM likes WHERE userId=$1 AND postId=$2`,
+    `SELECT * FROM likes WHERE "userId"=$1 AND "postId"=$2`,
     [userId, postId]
   );
 
@@ -18,17 +18,13 @@ export async function toggle(userId, postId) {
   
   if(isLiked) {
     await connection.query(
-      `DELETE FROM likes WHERE userId=$1 AND postId=$2`,
+      `DELETE FROM likes WHERE "userId"=$1 AND "postId"=$2`,
       [userId, postId]
     ); 
   } else {
     await connection.query(
-      `INSERT INTO likes (userId, postId) VALUES ($1, $2)`,
+      `INSERT INTO likes ("userId", "postId") VALUES ($1, $2)`,
       [userId, postId]
     );
   }
 }
-
-const likeRepository = { findManyPostsIds, toggle };
-
-export default likeRepository;

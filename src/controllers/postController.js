@@ -2,6 +2,7 @@ import urlMetadata from 'url-metadata';
 import * as postRepository from '../repositories/postRepository.js';
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
+import * as likeRepository from "../repositories/likeRepository.js";
 import userRepository from '../repositories/userRepository.js';
 import connection from '../database/connection.js';
 
@@ -148,5 +149,26 @@ export async function getPostsById(req, res) {
     return res.send(all);
   } catch (err) {
     return res.status(500).send(err.message);
+  }
+}
+
+export async function toggleLikePost(req, res) {
+  const { id } = req.params;
+
+  const { userId } = res.locals;
+  
+  try {
+    const post = await postRepository.get(id);
+
+    if(!post) {
+      return res.status(422).send("This post doesn't exist");
+    }
+
+    await likeRepository.toggle(userId, id);
+
+    return res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
   }
 }
