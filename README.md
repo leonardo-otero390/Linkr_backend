@@ -32,15 +32,15 @@ Below are the implemented features:
 }
 ```
 
-- it returns <strong style="color:purple;">400</strong> for empty auth, without Bearer or token not uuid
+- it returns <strong>400</strong> for empty auth, without Bearer or token not uuid
 
-- it returns <strong style="color:purple;">401</strong> for unauthorized
+- it returns <strong>401</strong> for unauthorized
 
 </details>
 
 <details>
     <summary>
-        <strong style="color:green;">POST</strong> /posts
+        <strong>POST</strong> /posts
     </summary>
 send body request like this:
 
@@ -53,7 +53,7 @@ send body request like this:
 
 - text is optional
 
-- it returns status <strong style="color:green;">201</strong> for success
+- it returns status <strong>201</strong> for success
 
 and object like this
 
@@ -77,6 +77,35 @@ and object like this
   "like": []
 }
 ```
+
+</details>
+<details>
+    <summary>
+        <strong>GET</strong> /hashtags/trending
+    </summary>
+
+- it returns status <strong>200</strong> for success
+
+and array like this
+
+```json
+[
+  {
+    "count": "10",
+    "name": "#topTrending",
+    "id": 13
+  },
+  {
+    "count": "5",
+    "name": "miranha",
+    "id": 12
+  }
+]
+```
+
+- count is the number of mentions
+
+</details>
 
 ## Technologies
 
