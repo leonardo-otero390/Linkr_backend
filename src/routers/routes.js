@@ -1,14 +1,16 @@
 import { Router } from 'express';
+import postRouter from './postRouter.js';
+import hashtagRouter from './hashtagRouter.js';
 import userRouter from './userRouter.js';
 import sessionRouter from './sessionRouter.js';
-import postsRouter from './postRouter.js';
 
 const routes = new Router();
 
 routes.get('/health', async (req, res) => {
   res.sendStatus(200);
 });
-routes.use(postsRouter);
+routes.use(postRouter);
+routes.use(hashtagRouter);
 routes.use(userRouter);
 routes.use(sessionRouter);
 

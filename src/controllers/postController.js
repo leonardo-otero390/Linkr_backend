@@ -12,6 +12,8 @@ function extractHashtags(text) {
 
 async function handleHashtags(text, postId) {
   const hashtags = extractHashtags(text);
+  if (!hashtags.length) return 0;
+
   const hashtagsInDb = (await hashtagRepository.findManyByName(hashtags)) || [];
   let hashtagsNotInDb = hashtags;
   if (hashtagsInDb.length) {
@@ -43,9 +45,9 @@ export async function create(req, res) {
       text: notHashtagText,
       link,
       userId,
-      title,
-      description,
-      image,
+      title: title || "Link doesn't have a title",
+      description: description || "Link doesn't have a description",
+      image: image || 'https://http.cat/404',
     });
 
     if (existHashtag) await handleHashtags(text, post.id);
@@ -56,7 +58,7 @@ export async function create(req, res) {
     delete user.password;
     return res.status(201).send({ post, user, like: [] });
   } catch (error) {
-    return res.sendStatus(500);
+    return res.status(500).send(error.message);
   }
 }
 

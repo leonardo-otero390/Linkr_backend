@@ -7,6 +7,10 @@ async function insertUser({ email, passwordHash, name, pictureUrl }) {
   );
 }
 
+async function getUserById(id) {
+  return connection.query(`SELECT * FROM users WHERE id=$1`, [id]);
+}
+
 async function getUserByEmail(email) {
   return connection.query(`SELECT * FROM users WHERE email=$1`, [email]);
 }
@@ -24,6 +28,12 @@ async function find(id) {
   return result.rows[0];
 }
 
-const userRepository = { find, insertUser, getUserByEmail, getUserByName };
+const userRepository = {
+  find,
+  insertUser,
+  getUserByEmail,
+  getUserByName,
+  getUserById,
+};
 
 export default userRepository;

@@ -26,6 +26,18 @@ export async function createUser(req, res) {
   }
 }
 
+export async function getUserById(req, res) {
+  try {
+    const userId = req.params.id;
+
+    const users = await userRepository.getUserById(userId);
+
+    res.send(users.rows);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}
+
 export async function getUserByName(req, res) {
   try {
     const { name } = req.body;
