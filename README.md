@@ -38,6 +38,46 @@ Below are the implemented features:
 
 </details>
 
+<details>
+    <summary>
+        <strong style="color:green;">POST</strong> /posts
+    </summary>
+send body request like this:
+
+```json
+{
+  "link": "https://www.google.com/",
+  "text": "awesome #search engine"
+}
+```
+
+- text is optional
+
+- it returns status <strong style="color:green;">201</strong> for success
+
+and object like this
+
+```json
+{
+  "post": {
+    "id": 49,
+    "link": "https://www.google.com/",
+    "text": "awesome #search engine",
+    "time": "2022-03-29T23:48:56.636Z",
+    "linkTitle": "Google",
+    "linkDescription": "Link doesn't have a description",
+    "linkImage": "/images/branding/googleg/1x/googleg_standard_color_128dp.png"
+  },
+  "user": {
+    "id": 2,
+    "email": "a@a.com",
+    "name": "leo",
+    "pictureUrl": "https://dragonball.com/goku.jpeg"
+  },
+  "like": []
+}
+```
+
 ## Technologies
 
 <div style="display: flex; gap: 10px; height: 40px;">
