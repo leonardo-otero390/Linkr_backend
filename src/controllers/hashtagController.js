@@ -1,17 +1,6 @@
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
-import * as likeRepository from '../repositories/likeRepository.js';
-
-async function insertLikesInPostArray(posts) {
-  const postsIds = posts.map((post) => post.id);
-  const likes = await likeRepository.findManyPostsIds(postsIds);
-  if(!likes) return posts;
-  return posts.map((post) => {
-    const thisPostlikes = likes.filter((like) => like.postId === post.id);
-
-    return { ...post, likes: thisPostlikes };
-  });
-}
+import * as postController from './postController.js';
 
 async function insertHashtagsInPostArray(posts){
   const postsIds = posts.map((post) => post.id);
@@ -41,7 +30,7 @@ async function organizePostObjects(posts) {
     };
     return object;
   });
-  arr = await insertLikesInPostArray(arr);
+  arr = await postController.insertLikesInPostArray(arr);
   arr = await insertHashtagsInPostArray(arr);
   return arr;
 }

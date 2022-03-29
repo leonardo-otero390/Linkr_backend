@@ -89,6 +89,17 @@ export async function remove(req, res) {
   }
 }
 
+export async function insertLikesInPostArray(posts) {
+  const postsIds = posts.map((post) => post.id);
+  const likes = await likeRepository.findManyPostsIds(postsIds);
+  if(!likes) return posts;
+  return posts.map((post) => {
+    const thisPostLikes = likes.filter((like) => like.postId === post.id);
+
+    return { ...post, likes: thisPostLikes };
+  });
+}
+
 export async function getPosts(req, res) {
   try {
     const posts = await connection.query(
@@ -99,7 +110,7 @@ export async function getPosts(req, res) {
       'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
     );
 
-    const all = posts.rows.map((p) => {
+    let all = posts.rows.map((p) => {
       const array = {
         ...p,
         hashtags: hashtagsPosts.rows.filter((h) => p.id === h.postId),
@@ -109,6 +120,8 @@ export async function getPosts(req, res) {
 
       return array;
     });
+
+    all = await insertLikesInPostArray(all);
 
     res.send(all);
   } catch (err) {
@@ -135,7 +148,7 @@ export async function getPostsById(req, res) {
       'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
     );
 
-    const all = posts.rows.map((p) => {
+    let all = posts.rows.map((p) => {
       const array = {
         ...p,
         hashtags: hashtagsPosts.rows.filter((h) => p.id === h.postId),
@@ -145,6 +158,8 @@ export async function getPostsById(req, res) {
 
       return array;
     });
+
+    all = await insertLikesInPostArray(all);
 
     return res.send(all);
   } catch (err) {
