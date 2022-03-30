@@ -91,7 +91,7 @@ export async function remove(req, res) {
 
 export async function insertLikesInPostArray(posts) {
   const postsIds = posts.map((post) => post.id);
-  const likes = await likeRepository.findManyPostsIds(postsIds);
+  const likes = await likeRepository.findByPostIds(postsIds);
   if(!likes) return posts;
   return posts.map((post) => {
     const thisPostLikes = likes.filter((like) => like.postId === post.id);

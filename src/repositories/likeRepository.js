@@ -1,8 +1,11 @@
 import connection from '../database/connection.js';
 
-export async function findManyPostsIds(ids) {
+export async function findByPostIds(ids) {
   const result = await connection.query(
-    `SELECT * FROM likes WHERE "postId" IN (${ids});`
+    `SELECT
+      "postId", "userId", name as "userName"
+    FROM likes JOIN users ON likes."userId"=users.id
+    WHERE "postId" IN (${ids});`
   );
   
   return result.rows;
