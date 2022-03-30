@@ -20,6 +20,7 @@ async function find(id) {
   const result = await connection.query(`SELECT * FROM users WHERE id=$1`, [
     id,
   ]);
+
   if (!result.rowCount) return null;
   return result.rows[0];
 }

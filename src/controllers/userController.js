@@ -37,3 +37,16 @@ export async function getUserByName(req, res) {
     res.status(500).send(error.message);
   }
 }
+
+export async function getUserById(req, res) {
+  try {
+    const { id } = req.params;
+
+    const users = await userRepository.find(id);
+
+    if (users === null) return res.send(404);
+    return res.send(users);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}

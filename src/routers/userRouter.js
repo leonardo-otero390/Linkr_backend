@@ -1,12 +1,19 @@
 import { Router } from 'express';
 
-import { createUser, getUserByName } from '../controllers/userController.js';
+import {
+  createUser,
+  getUserByName,
+  getUserById,
+} from '../controllers/userController.js';
 import validateSchema from '../middlewares/schemaValidationMiddleware.js';
+import validateAuth from '../middlewares/authValidationMiddleware.js';
+
 import userSchema from '../schemas/userSchema.js';
 
 const userRouter = Router();
 
 userRouter.post('/users', validateSchema(userSchema), createUser);
-userRouter.get('/users', getUserByName);
+userRouter.get('/users', validateAuth, getUserByName);
+userRouter.get('/users/:id', validateAuth, getUserById);
 
 export default userRouter;
