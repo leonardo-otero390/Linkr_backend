@@ -42,6 +42,7 @@ export async function createSession(req, res) {
     await sessionRepository.createSession(sessionData);
 
     const auth = {
+      userId: user.id,
       userName: user.name,
       userPicture: user.pictureUrl,
       token: sessionData.token

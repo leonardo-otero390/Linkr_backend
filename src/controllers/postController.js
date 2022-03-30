@@ -2,6 +2,7 @@ import urlMetadata from 'url-metadata';
 import * as postRepository from '../repositories/postRepository.js';
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
+import * as likeRepository from "../repositories/likeRepository.js";
 import userRepository from '../repositories/userRepository.js';
 import connection from '../database/connection.js';
 
@@ -83,6 +84,17 @@ export async function remove(req, res) {
   }
 }
 
+export async function insertLikesInPostArray(posts) {
+  const postsIds = posts.map((post) => post.id);
+  const likes = await likeRepository.findByPostIds(postsIds);
+  if(!likes) return posts;
+  return posts.map((post) => {
+    const thisPostLikes = likes.filter((like) => like.postId === post.id);
+
+    return { ...post, likes: thisPostLikes };
+  });
+}
+
 export async function getPosts(req, res) {
   try {
     const posts = await connection.query(
@@ -93,7 +105,7 @@ export async function getPosts(req, res) {
       'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
     );
 
-    const all = posts.rows.map((p) => {
+    let all = posts.rows.map((p) => {
       const array = {
         ...p,
         hashtags: hashtagsPosts.rows.filter((h) => p.id === h.postId),
@@ -103,6 +115,8 @@ export async function getPosts(req, res) {
 
       return array;
     });
+
+    all = await insertLikesInPostArray(all);
 
     res.send(all);
   } catch (err) {
@@ -129,7 +143,7 @@ export async function getPostsById(req, res) {
       'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
     );
 
-    const all = posts.rows.map((p) => {
+    let all = posts.rows.map((p) => {
       const array = {
         ...p,
         hashtags: hashtagsPosts.rows.filter((h) => p.id === h.postId),
@@ -140,8 +154,31 @@ export async function getPostsById(req, res) {
       return array;
     });
 
+    all = await insertLikesInPostArray(all);
+
     return res.send(all);
   } catch (err) {
     return res.status(500).send(err.message);
+  }
+}
+
+export async function toggleLikePost(req, res) {
+  const { id } = req.params;
+
+  const { userId } = res.locals;
+  
+  try {
+    const post = await postRepository.get(id);
+
+    if(!post) {
+      return res.status(422).send("This post doesn't exist");
+    }
+
+    await likeRepository.toggle(userId, id);
+
+    return res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
   }
 }
