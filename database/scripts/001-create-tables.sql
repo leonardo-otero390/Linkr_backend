@@ -2,7 +2,7 @@ CREATE TABLE "users" (
 	"id" serial NOT NULL,
 	"email" TEXT NOT NULL UNIQUE,
 	"password" TEXT NOT NULL,
-	"name" TEXT NOT NULL UNIQUE,
+	"name" TEXT NOT NULL,
 	"pictureUrl" TEXT NOT NULL,
 	CONSTRAINT "users_pk" PRIMARY KEY ("id")
 ) WITH (
