@@ -40,12 +40,40 @@ export async function getUserByName(req, res) {
   }
 }
 
+export async function unfollow(req, res) {
+  const followerId = res.locals.userId;
+  const followedId = Number(req.params.id);
+
+  if (Number.isNaN(followedId))
+    return res.status(400).send('The followed id must be a number');
+
+  if (followerId === followedId)
+    return res.status(400).send('You cannot unfollow yourself');
+
+  try {
+    const followedUser = await userRepository.find(followedId);
+    if (!followedUser) return res.status(404).send('The user does not exist');
+    const followedFollowers = await followerRepository.getFollowers(followedId);
+    if (
+      followedFollowers.some((follower) => follower.followerId === followerId)
+    )
+      return res.status(404).send('You are not following this user');
+    await followerRepository.removeFollow({ followerId, followedId });
+    return res.sendStatus(200);
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
 export async function follow(req, res) {
   const followerId = res.locals.userId;
   const followedId = Number(req.params.id);
 
   if (Number.isNaN(followedId))
     return res.status(400).send('The followed id must be a number');
+
+  if (followerId === followedId)
+    return res.status(400).send('You cannot follow yourself');
 
   try {
     const followedUser = await userRepository.find(followedId);
