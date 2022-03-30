@@ -40,6 +40,18 @@ export async function getUserByName(req, res) {
   }
 }
 
+export async function getFollows(req, res) {
+  try {
+    const { userId } = res.locals;
+
+    const follows = await followerRepository.getFollows(userId);
+
+    res.send(follows);
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+}
+
 export async function toggleFollow(req, res) {
   const followerId = res.locals.userId;
   const followedId = Number(req.params.id);
@@ -53,9 +65,9 @@ export async function toggleFollow(req, res) {
   try {
     const followedUser = await userRepository.find(followedId);
     if (!followedUser) return res.status(404).send('The user does not exist');
-    const followedFollowers = await followerRepository.getFollowers(followedId);
+    const follows = await followerRepository.getFollows(followerId);
     if (
-      followedFollowers.some((follower) => follower.followerId === followerId)
+      follows.some((follow) => follow.followedId === followedId)
     ) {
       await followerRepository.removeFollow({ followerId, followedId });
       return res.sendStatus(200);

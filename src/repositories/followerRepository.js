@@ -26,18 +26,20 @@ async function removeFollow({ followerId, followedId }) {
   return result.rows[0];
 }
 
-async function getFollowers(followedId) {
+async function getFollows(followerId) {
   const result = await connection.query(
     `
   SELECT * FROM followers
-  WHERE "followedId" = $1
+  WHERE "followerId" = $1
 `,
-    [followedId]
+    [followerId]
   );
   if (!result.rowCount) return [];
   return result.rows;
 }
 
-const followerRepository = { insertFollower, getFollowers,removeFollow };
+
+
+const followerRepository = { insertFollower, getFollows,removeFollow };
 
 export default followerRepository;

@@ -152,6 +152,32 @@ and array like this
 
 </details>
 
+<details>
+    <summary>
+        <strong>GET</strong> /users/follows
+    </summary>
+
+- it returns status <strong>200</strong> for success
+
+and array like this
+
+```json
+[
+  {
+    "id": 5,
+    "followedId": 1,
+    "followerId": 2
+  }
+  {
+    "id": 6,
+    "followedId": 5,
+    "followerId": 2
+  }
+]
+```
+
+</details>
+
 ## Technologies
 
 <div style="display: flex; gap: 10px; height: 40px;">
