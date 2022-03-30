@@ -2,7 +2,7 @@ CREATE TABLE "users" (
 	"id" serial NOT NULL,
 	"email" TEXT NOT NULL UNIQUE,
 	"password" TEXT NOT NULL,
-	"name" TEXT NOT NULL UNIQUE,
+	"name" TEXT NOT NULL,
 	"pictureUrl" TEXT NOT NULL,
 	CONSTRAINT "users_pk" PRIMARY KEY ("id")
 ) WITH (
@@ -128,8 +128,9 @@ ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk1" FOREIGN KEY ("postId") REFERE
 
 
 
+ALTER TABLE "comments" ADD CONSTRAINT "comments_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id");
+ALTER TABLE "comments" ADD CONSTRAINT "comments_fk1" FOREIGN KEY ("userId") REFERENCES "users"("id");
 
-
-
-
+ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk0" FOREIGN KEY ("userId") REFERENCES "users"("id");
+ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk1" FOREIGN KEY ("postId") REFERENCES "posts"("id");
 
