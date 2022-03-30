@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 
 import userRepository from '../repositories/userRepository.js';
+import followerRepository from '../repositories/followerRepository.js';
 
 export async function createUser(req, res) {
   const newUser = req.body;
@@ -36,5 +37,27 @@ export async function getUserByName(req, res) {
     res.send(users.rows);
   } catch (error) {
     res.status(500).send(error.message);
+  }
+}
+
+export async function follow(req, res) {
+  const followerId = res.locals.userId;
+  const followedId = Number(req.params.id);
+
+  if (Number.isNaN(followedId))
+    return res.status(400).send('The followed id must be a number');
+
+  try {
+    const followedUser = await userRepository.find(followedId);
+    if (!followedUser) return res.status(404).send('The user does not exist');
+    const followedFollowers = await followerRepository.getFollowers(followedId);
+    if (
+      followedFollowers.some((follower) => follower.followerId === followerId)
+    )
+      return res.status(409).send('You are already following this user');
+    await followerRepository.insertFollower({ followerId, followedId });
+    return res.sendStatus(201);
+  } catch (error) {
+    return res.status(500).send(error.message);
   }
 }
