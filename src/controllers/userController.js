@@ -26,11 +26,11 @@ export async function createUser(req, res) {
   }
 }
 
-export async function getUserById(req, res) {
+export async function getUserByName(req, res) {
   try {
-    const userId = req.params.id;
+    const { name } = req.query;
 
-    const users = await userRepository.getUserById(userId);
+    const users = await userRepository.getUserByName(name);
 
     res.send(users.rows);
   } catch (error) {
@@ -38,14 +38,15 @@ export async function getUserById(req, res) {
   }
 }
 
-export async function getUserByName(req, res) {
+export async function getUserById(req, res) {
   try {
-    const { name } = req.body;
+    const { id } = req.params;
 
-    const users = await userRepository.getUserByName(name);
+    const users = await userRepository.find(id);
 
-    res.send(users.rows);
+    if (users === null) return res.send(404);
+    return res.send(users);
   } catch (error) {
-    res.status(500).send(error.message);
+    return res.status(500).send(error.message);
   }
 }

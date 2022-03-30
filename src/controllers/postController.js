@@ -34,15 +34,12 @@ async function handleHashtags(text, postId) {
 export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
-  const existHashtag = text.includes('#');
-  const textSplit = text.split('#');
-  const notHashtagText = textSplit[0];
 
   try {
     const { title, description, image } = await urlMetadata(link);
 
     const post = await postRepository.insert({
-      text: notHashtagText,
+      text,
       link,
       userId,
       title: title || "Link doesn't have a title",
@@ -50,13 +47,37 @@ export async function create(req, res) {
       image: image || 'https://http.cat/404',
     });
 
-    if (existHashtag) await handleHashtags(text, post.id);
+    await handleHashtags(text, post.id);
 
     delete post.authorId;
 
     const user = await userRepository.find(userId);
     delete user.password;
     return res.status(201).send({ post, user, like: [] });
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+export async function remove(req, res) {
+  try {
+    const { id } = req.params;
+
+    const { userId } = res.locals;
+
+    const postToDelete = await postRepository.get(id);
+
+    if (!postToDelete) {
+      return res.status(422).send('There is no post with this id');
+    }
+
+    if (postToDelete.authorId !== userId) {
+      return res.status(401).send('This post is not yours');
+    }
+
+    await postRepository.remove(id);
+
+    return res.sendStatus(200);
   } catch (error) {
     return res.status(500).send(error.message);
   }

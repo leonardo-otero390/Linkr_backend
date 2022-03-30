@@ -1,4 +1,3 @@
-import faker from 'faker-br';
 import supertest from 'supertest';
 import app from '../../src/app';
 
@@ -8,7 +7,7 @@ export async function createPost({ token, text,link }) {
   try {
     const response = await agent
       .post('/posts')
-      .set('Authorization', 'Bearer ' + token)
+      .set('Authorization', `Bearer ${  token}`)
       .send({ text, link });
     return response.body;
   } catch (error) {

@@ -18,23 +18,36 @@ beforeAll(async () => {
   token = auth.token;
 });
 
-afterAll(async () => databaseUtil.closeConnection());
+afterAll(() => databaseUtil.closeConnection());
 
-describe('GET /hashtags/trending', () => {
+describe('GET /hashtags/HASHTAG/posts', () => {
   it('should return 204', async () => {
     const response = await agent
-      .get('/hashtags/trending')
+      .get('/hashtags/teste/posts')
       .set('Authorization', `Bearer ${token}`);
 
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(204);
   });
   it('should return 200 and a body', async () => {
     await createManyPosts(token);
     const response = await agent
-      .get('/hashtags/trending')
+      .get('/hashtags/top1/posts')
       .set('Authorization', `Bearer ${token}`);
     const keys = Object.keys(response.body[0]);
+    const postKeys = [
+      'id',
+      'text',
+      'link',
+      'linkTitle',
+      'linkDescription',
+      'linkImage',
+      'authorId',
+      'name',
+      'pictureUrl',
+      'likes',
+      'hashtags',
+    ];
     expect(response.status).toBe(200);
-    expect(keys).toStrictEqual(['count', 'name', 'id']);
+    expect(keys).toStrictEqual(postKeys);
   });
 });
