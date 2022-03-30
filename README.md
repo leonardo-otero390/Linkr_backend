@@ -70,8 +70,8 @@ and object like this
   },
   "user": {
     "id": 2,
-    "email": "a@a.com",
-    "name": "leo",
+    "email": "goku@kame.com",
+    "name": "goku",
     "pictureUrl": "https://dragonball.com/goku.jpeg"
   },
   "like": []
@@ -101,6 +101,38 @@ and array like this
     "id": 12
   }
 ]
+```
+
+- count is the number of mentions
+
+</details>
+
+<details>
+    <summary>
+        <strong>GET</strong> /hashtags/HASHTAG/posts
+    </summary>
+
+- it returns status <strong>200</strong> for success
+
+- change HASHTAG to the hashtag you're looking for
+
+and array like this
+
+```json
+[
+  {
+    "id": 27,
+    "text": "testing is cool #teste",
+    "link": "https://www.google.com/",
+    "linkTitle": "Google",
+    "linkDescription": "Link doesn't have a description",
+    "linkImage": "/images/branding/googleg/1x/googleg_standard_color_128dp.png",
+    "authorId": 2,
+    "name": "goku",
+    "pictureUrl": "https://dragonball.com/goku.jpeg",
+    "likes": [],
+    "hashtags": []
+  },
 ```
 
 - count is the number of mentions
