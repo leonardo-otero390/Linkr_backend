@@ -110,7 +110,7 @@ export async function getPosts(req, res) {
         .status(404)
         .send("You don't follow anyone yet. Search for new friends!");
     const followedIds = follows.map((follow) => follow.followedId);
-    const posts = await postRepository.findManyByAuthorIds(followedIds);
+    const posts = await postRepository.findManyByAuthorIds([userId, ...followedIds]);
     if (!posts) return res.status(404).send('No posts found from your friends');
     const result = await insertLikesInPostArray(posts);
     return res.send(result);
