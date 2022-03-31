@@ -2,7 +2,7 @@ import urlMetadata from 'url-metadata';
 import * as postRepository from '../repositories/postRepository.js';
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
-import * as likeRepository from "../repositories/likeRepository.js";
+import * as likeRepository from '../repositories/likeRepository.js';
 import userRepository from '../repositories/userRepository.js';
 import connection from '../database/connection.js';
 
@@ -87,7 +87,7 @@ export async function remove(req, res) {
 export async function insertLikesInPostArray(posts) {
   const postsIds = posts.map((post) => post.id);
   const likes = await likeRepository.findByPostIds(postsIds);
-  if(!likes) return posts;
+  if (!likes) return posts;
   return posts.map((post) => {
     const thisPostLikes = likes.filter((like) => like.postId === post.id);
 
@@ -96,9 +96,16 @@ export async function insertLikesInPostArray(posts) {
 }
 
 export async function getPosts(req, res) {
+  let { page } = req.query;
+  const menos = page - 1;
+
+  if (page === undefined) page = 0;
+  else page = menos;
+
   try {
     const posts = await connection.query(
-      'SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id ORDER BY p.id DESC LIMIT 20;'
+      `SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id ORDER BY p.id DESC LIMIT 10 OFFSET $1;`,
+      [10 * page]
     );
 
     const hashtagsPosts = await connection.query(
@@ -166,11 +173,11 @@ export async function toggleLikePost(req, res) {
   const { id } = req.params;
 
   const { userId } = res.locals;
-  
+
   try {
     const post = await postRepository.get(id);
 
-    if(!post) {
+    if (!post) {
       return res.status(422).send("This post doesn't exist");
     }
 
@@ -178,7 +185,6 @@ export async function toggleLikePost(req, res) {
 
     return res.sendStatus(200);
   } catch (error) {
-    console.error(error);
     return res.sendStatus(500);
   }
 }
