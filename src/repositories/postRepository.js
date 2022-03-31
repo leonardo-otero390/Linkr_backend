@@ -40,11 +40,15 @@ export async function get(id) {
 export async function findManyByAuthorIds(ids) {
   const result = await connection.query(
     `
-    SELECT * FROM posts WHERE "authorId" IN (${ids})
-    ORDER BY id DESC
+    SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",
+    p."linkImage", u.name, u."pictureUrl"
+    FROM posts p
+    JOIN users u ON p."authorId" = u.id
+    WHERE "authorId" IN (${ids})
+    ORDER BY p.id DESC
     LIMIT 20;
     `
   );
-  if(!result.rowCount) return null;
+  if (!result.rowCount) return null;
   return result.rows;
 }
