@@ -18,6 +18,8 @@ export async function remove(id) {
   // Deleting post dependents
   await connection.query(`DELETE FROM likes WHERE "postId"=$1`, [id]);
   await connection.query(`DELETE FROM "hashtagsPosts" WHERE "postId"=$1`, [id]);
+  await connection.query(`DELETE FROM comments WHERE "postId"=$1`, [id]);
+  await connection.query(`DELETE FROM reposts WHERE "postId"=$1`, [id]);
   
   await connection.query(`DELETE FROM posts WHERE id=$1`, [id]);
 }
