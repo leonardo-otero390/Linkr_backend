@@ -35,6 +35,7 @@ async function handleHashtags(text, postId) {
 export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
+  const existHashtag = text.includes('#');
 
   try {
     const { title, description, image } = await urlMetadata(link);
@@ -48,7 +49,7 @@ export async function create(req, res) {
       image: image || 'https://http.cat/404',
     });
 
-    await handleHashtags(text, post.id);
+    if (existHashtag) await handleHashtags(text, post.id);
 
     delete post.authorId;
 
