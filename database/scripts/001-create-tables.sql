@@ -23,15 +23,15 @@ CREATE TABLE "sessions" (
 
 
 CREATE TABLE "posts" (
-    "id" serial NOT NULL,
-    "link" TEXT NOT NULL,
-    "linkTitle" TEXT NOT NULL,
-    "linkDescription" TEXT NOT NULL,
-    "linkImage" TEXT NOT NULL,
-    "text" TEXT NOT NULL,
-    "authorId" integer NOT NULL,
-    "time" TIMESTAMP NOT NULL DEFAULT NOW(),
-    CONSTRAINT "posts_pk" PRIMARY KEY ("id")
+	"id" serial NOT NULL,
+	"link" TEXT NOT NULL,
+	"linkTitle" TEXT NOT NULL,
+	"linkDescription" TEXT NOT NULL,
+	"linkImage" TEXT NOT NULL,
+	"text" TEXT NOT NULL,
+	"authorId" integer NOT NULL,
+	"time" TIMESTAMP NOT NULL DEFAULT NOW(),
+	CONSTRAINT "posts_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
 );
@@ -118,6 +118,15 @@ ALTER TABLE "hashtagsPosts" ADD CONSTRAINT "hashtagsPosts_fk1" FOREIGN KEY ("pos
 
 ALTER TABLE "followers" ADD CONSTRAINT "followers_fk0" FOREIGN KEY ("followedId") REFERENCES "users"("id");
 ALTER TABLE "followers" ADD CONSTRAINT "followers_fk1" FOREIGN KEY ("followerId") REFERENCES "users"("id");
+
+ALTER TABLE "comments" ADD CONSTRAINT "comments_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id");
+ALTER TABLE "comments" ADD CONSTRAINT "comments_fk1" FOREIGN KEY ("userId") REFERENCES "users"("id");
+
+ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk0" FOREIGN KEY ("userId") REFERENCES "users"("id");
+ALTER TABLE "reposts" ADD CONSTRAINT "reposts_fk1" FOREIGN KEY ("postId") REFERENCES "posts"("id");
+
+
+
 
 ALTER TABLE "comments" ADD CONSTRAINT "comments_fk0" FOREIGN KEY ("postId") REFERENCES "posts"("id");
 ALTER TABLE "comments" ADD CONSTRAINT "comments_fk1" FOREIGN KEY ("userId") REFERENCES "users"("id");
