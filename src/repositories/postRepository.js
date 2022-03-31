@@ -22,6 +22,10 @@ export async function remove(id) {
   await connection.query(`DELETE FROM posts WHERE id=$1`, [id]);
 }
 
+export async function edit(id, newText) {
+  await connection.query(`UPDATE posts set text=$2 WHERE id=$1`, [id, newText]);
+}
+
 export async function get(id) {
   const result = await connection.query(`SELECT * FROM posts WHERE id=$1`, [id]);
 
