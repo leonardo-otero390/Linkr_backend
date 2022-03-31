@@ -30,7 +30,7 @@ async function organizePostObjects(posts) {
     };
     return object;
   });
-  arr = await postController.insertLikesInPostArray(arr);
+  arr = await postController.addPostActionsInfo(arr);
   arr = await insertHashtagsInPostArray(arr);
   return arr;
 }

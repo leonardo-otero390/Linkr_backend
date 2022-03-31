@@ -33,6 +33,41 @@ async function handleHashtags(text, postId) {
   return hashtagsIds;
 }
 
+async function insertLikesInPostArray(posts) {
+  const postsIds = posts.map((post) => post.id);
+  const likes = await likeRepository.findByPostIds(postsIds);
+  if(!likes) return posts;
+  return posts.map((post) => {
+    const thisPostLikes = likes.filter((like) => like.postId === post.id);
+
+    return { ...post, likes: thisPostLikes };
+  });
+}
+
+async function insertRepostCountInPostArray(posts) {
+  const postsIds = posts.map((post) => post.id);
+  const repostCounts = await repostRepository.countByPostIds(postsIds);
+  if(!repostCounts) return posts;
+  return posts.map((post) => {
+    const thisPostRepostCount = repostCounts.find((r) => r.postId === post.id);
+
+    return { 
+      ...post,
+      repostCount: thisPostRepostCount || {
+        postId: post.id,
+        count: 0,
+      },
+    };
+  });
+}
+
+export async function addPostActionsInfo(posts) {
+  let postsWithInfo = await insertLikesInPostArray(posts);
+  postsWithInfo = await insertRepostCountInPostArray(postsWithInfo);
+
+  return postsWithInfo;
+}
+
 export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
@@ -90,17 +125,6 @@ export async function remove(req, res) {
   }
 }
 
-export async function insertLikesInPostArray(posts) {
-  const postsIds = posts.map((post) => post.id);
-  const likes = await likeRepository.findByPostIds(postsIds);
-  if(!likes) return posts;
-  return posts.map((post) => {
-    const thisPostLikes = likes.filter((like) => like.postId === post.id);
-
-    return { ...post, likes: thisPostLikes };
-  });
-}
-
 export async function getPosts(req, res) {
   try {
     const posts = await connection.query(
@@ -122,7 +146,7 @@ export async function getPosts(req, res) {
       return array;
     });
 
-    all = await insertLikesInPostArray(all);
+    all = await addPostActionsInfo(all);
 
     res.send(all);
   } catch (err) {
@@ -160,7 +184,7 @@ export async function getPostsById(req, res) {
       return array;
     });
 
-    all = await insertLikesInPostArray(all);
+    all = await addPostActionsInfo(all);
 
     return res.send(all);
   } catch (err) {
