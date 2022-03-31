@@ -7,16 +7,16 @@ import { getPosts, getPostsById } from '../controllers/postController.js';
 
 const PostsRoute = new Router();
 
-
-PostsRoute.get('/posts', validateAuth, getPosts);
-PostsRoute.get('/posts/:id', validateAuth, getPostsById);
+PostsRoute.use(validateAuth);
+PostsRoute.get('/posts', getPosts);
+PostsRoute.get('/posts/:id', getPostsById);
 PostsRoute.post(
   '/posts',
   validateSchema(postSchemas.newPost),
-  validateAuth,
+
   postController.create
 );
-PostsRoute.delete('/posts/:id', validateAuth, postController.remove);
-PostsRoute.post("/posts/:id/toggle-like", validateAuth, postController.toggleLikePost);
+PostsRoute.delete('/posts/:id', postController.remove);
+PostsRoute.post('/posts/:id/toggle-like', postController.toggleLikePost);
 
 export default PostsRoute;
