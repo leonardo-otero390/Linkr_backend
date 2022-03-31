@@ -2,7 +2,7 @@ import urlMetadata from 'url-metadata';
 import * as postRepository from '../repositories/postRepository.js';
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
-import * as likeRepository from "../repositories/likeRepository.js";
+import * as likeRepository from '../repositories/likeRepository.js';
 import userRepository from '../repositories/userRepository.js';
 import connection from '../database/connection.js';
 
@@ -36,14 +36,12 @@ export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
   const existHashtag = text.includes('#');
-  const textSplit = text.split('#');
-  const notHashtagText = textSplit[0];
 
   try {
     const { title, description, image } = await urlMetadata(link);
 
     const post = await postRepository.insert({
-      text: notHashtagText,
+      text,
       link,
       userId,
       title: title || "Link doesn't have a title",
@@ -59,40 +57,38 @@ export async function create(req, res) {
     delete user.password;
     return res.status(201).send({ post, user, like: [] });
   } catch (error) {
-    console.log(error.message);
-    return res.sendStatus(500);
+    return res.status(500).send(error.message);
   }
 }
 
 export async function remove(req, res) {
   try {
     const { id } = req.params;
-  
+
     const { userId } = res.locals;
-  
+
     const postToDelete = await postRepository.get(id);
-  
-    if(!postToDelete) {
+
+    if (!postToDelete) {
       return res.status(422).send('There is no post with this id');
     }
-  
-    if(postToDelete.authorId !== userId) {
+
+    if (postToDelete.authorId !== userId) {
       return res.status(401).send('This post is not yours');
     }
-  
+
     await postRepository.remove(id);
-  
+
     return res.sendStatus(200);
   } catch (error) {
-    console.error(error);
-    return res.status(500).send('There was an internal server error');
+    return res.status(500).send(error.message);
   }
 }
 
 export async function insertLikesInPostArray(posts) {
   const postsIds = posts.map((post) => post.id);
   const likes = await likeRepository.findByPostIds(postsIds);
-  if(!likes) return posts;
+  if (!likes) return posts;
   return posts.map((post) => {
     const thisPostLikes = likes.filter((like) => like.postId === post.id);
 
@@ -171,11 +167,11 @@ export async function toggleLikePost(req, res) {
   const { id } = req.params;
 
   const { userId } = res.locals;
-  
+
   try {
     const post = await postRepository.get(id);
 
-    if(!post) {
+    if (!post) {
       return res.status(422).send("This post doesn't exist");
     }
 
