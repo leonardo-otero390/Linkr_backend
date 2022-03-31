@@ -2,7 +2,7 @@ import urlMetadata from 'url-metadata';
 import * as postRepository from '../repositories/postRepository.js';
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
-import * as likeRepository from "../repositories/likeRepository.js";
+import * as likeRepository from '../repositories/likeRepository.js';
 import userRepository from '../repositories/userRepository.js';
 import connection from '../database/connection.js';
 
@@ -35,6 +35,7 @@ async function handleHashtags(text, postId) {
 export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
+  const existHashtag = text.includes('#');
 
   try {
     const { title, description, image } = await urlMetadata(link);
@@ -48,7 +49,7 @@ export async function create(req, res) {
       image: image || 'https://http.cat/404',
     });
 
-    await handleHashtags(text, post.id);
+    if (existHashtag) await handleHashtags(text, post.id);
 
     delete post.authorId;
 
@@ -87,7 +88,7 @@ export async function remove(req, res) {
 export async function insertLikesInPostArray(posts) {
   const postsIds = posts.map((post) => post.id);
   const likes = await likeRepository.findByPostIds(postsIds);
-  if(!likes) return posts;
+  if (!likes) return posts;
   return posts.map((post) => {
     const thisPostLikes = likes.filter((like) => like.postId === post.id);
 
@@ -166,11 +167,11 @@ export async function toggleLikePost(req, res) {
   const { id } = req.params;
 
   const { userId } = res.locals;
-  
+
   try {
     const post = await postRepository.get(id);
 
-    if(!post) {
+    if (!post) {
       return res.status(422).send("This post doesn't exist");
     }
 
