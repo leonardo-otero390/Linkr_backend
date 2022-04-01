@@ -90,7 +90,7 @@ export async function remove(req, res) {
 export async function getPosts(req, res) {
   try {
     const posts = await connection.query(
-      'SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id ORDER BY p.id DESC LIMIT 20;'
+      'SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id ORDER BY p.id DESC;'
     );
 
     const hashtagsPosts = await connection.query(
@@ -119,12 +119,12 @@ export async function getPosts(req, res) {
 
 export async function getPostsByUserId(req, res) {
   const userId = Number(req.params.id);
-  if(Number.isNaN(userId)) return res.status(422).send('User id must be a number');
+  if (Number.isNaN(userId))
+    return res.status(422).send('User id must be a number');
 
   try {
     const user = await userRepository.find(userId);
     if (!user) return res.status(404).send('User not found');
-    
 
     const posts = await postRepository.findManyByUserId(userId);
 
