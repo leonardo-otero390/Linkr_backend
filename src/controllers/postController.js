@@ -111,9 +111,6 @@ export async function getPosts(req, res) {
 
     all = await postUtils.addPostActionsInfo(all);
 
-    const reposts = await repostUtils.getReposts();
-    all = [...all, ...reposts].sort((a, b) => b.id - a.id);
-
     res.send(all);
   } catch (err) {
     console.error(err);
