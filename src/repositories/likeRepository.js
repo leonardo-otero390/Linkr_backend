@@ -1,6 +1,10 @@
 import connection from '../database/connection.js';
 
 export async function findByPostIds(ids) {
+  if (ids === null || ids.length === 0) {
+    return [];
+  }
+
   const result = await connection.query(
     `SELECT
       "postId", "userId", name as "userName"
