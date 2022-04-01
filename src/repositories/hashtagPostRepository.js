@@ -10,13 +10,13 @@ export async function insertMany({ postId, hashtagsIds }) {
   return true;
 }
 
-export async function findPostsByHashtag(name) {
+export async function findPostsByHashtag(name, page, limit) {
   const result = await connection.query(
     `SELECT *,users.name as username FROM "posts"
     JOIN "hashtagsPosts" ON "posts"."id" = "hashtagsPosts"."postId"
     JOIN "hashtags" ON "hashtags"."id" = "hashtagsPosts"."hashtagId"
     JOIN users ON users.id = posts."authorId"
-    WHERE "hashtags"."name" = $1;`,
+    WHERE "hashtags"."name" = $1 ORDER BY "posts".id DESC ${limit} ${page};`,
     [name]
   );
   if (!result.rowCount) return false;

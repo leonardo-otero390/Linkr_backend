@@ -51,8 +51,14 @@ export async function getTrending(req, res) {
 
 export async function getPostsByHashtag(req, res) {
   const { name } = req.params;
+  const { page, limit } = res.locals;
+
   try {
-    const posts = await hashtagPostRepository.findPostsByHashtag(name);
+    const posts = await hashtagPostRepository.findPostsByHashtag(
+      name,
+      page,
+      limit
+    );
     if (!posts) return res.status(204).send('No posts found');
     const result = await organizePostObjects(posts);
     return res.status(200).send(result);

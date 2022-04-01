@@ -139,7 +139,7 @@ export async function getPostsById(req, res) {
     if (valideIds.rowCount === 0) return res.sendStatus(404);
 
     const posts = await connection.query(
-      `SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id WHERE p."authorId"=$1 ORDER BY p.id DESC ${limit} ${page};`,
+      `SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id WHERE p."authorId"=$1 ORDER BY p.id DESC ${limit} ${page}`,
       [userId]
     );
 
