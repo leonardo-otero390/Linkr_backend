@@ -32,34 +32,6 @@ async function handleHashtags(text, postId) {
   return hashtagsIds;
 }
 
-function compareHashtags(oldHashtags, newHashtags) {
-  const hashtable = {};
-  const hashtagsToDelete = [];
-  const hashtagsToAdd = [];
-
-  oldHashtags.forEach((h) => {hashtable[h] = true});
-
-  newHashtags.forEach((h) => {
-    const isInOlds = hashtable[h];
-
-    if (isInOlds) {
-      hashtable[h] = false;
-    } else {
-      hashtagsToAdd.push(h);
-    }
-  });
-
-  const hashtableValues = Object.values(hashtable);
-
-  hashtableValues.forEach((v, i) => {
-    if (v) {
-      hashtagsToDelete.push(oldHashtags[i]);
-    }
-  });
-
-  return [hashtagsToDelete, hashtagsToAdd];
-}
-
 export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
@@ -120,9 +92,7 @@ export async function remove(req, res) {
 export async function edit(req, res) {
   try {
     const { id } = req.params;
-  
     const { userId } = res.locals;
-
     const { newText } = req.body;
   
     const postToEdit = await postRepository.get(id);
@@ -136,28 +106,24 @@ export async function edit(req, res) {
     }
 
     if(postToEdit.text === newText) {
-      return res.status(404).send('There was no change');
+      return res.status(400).send('There was no change');
     }
   
-    if (newText.includes('#')) {
-/*       const hashtags =  await handleHashtags(newText, id); */
-      const oldHashtags = await hashtagPostRepository.findHashtagsNamesByPostsIds(id);
-
-      const oldHashtagsNames = oldHashtags.map(({name}) => name);
-      const newHashtagsNames = extractHashtags(newText);
-
-      const [hashtagsToDelete, hashtagsToAdd] = compareHashtags(oldHashtagsNames, newHashtagsNames);
-      console.log(hashtagsToDelete,hashtagsToAdd);
-/*       await hashtagPostRepository.removeUnsedHashtags(id, hashtags); */
-    }
-
     await postRepository.edit(id, newText);
 
+    const hashtagsDeletedIds = await hashtagPostRepository.removeByPostId(id);
+    
+    hashtagsDeletedIds.forEach( async ({hashtagId}) => {
+      const amount = await hashtagPostRepository.checkAmountOfRows(hashtagId);
 
+      if (amount === 1) {
+        await hashtagRepository.removeById(hashtagId);  
+      };
+    })
+    await handleHashtags(newText, id);
 
     return res.status(200).send(newText);
   } catch (error) {
-    console.error(error);
     return res.status(500).send('There was an internal server error');
   }
 }
