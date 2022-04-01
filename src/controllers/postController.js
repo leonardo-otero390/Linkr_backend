@@ -5,6 +5,8 @@ import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js
 import * as likeRepository from '../repositories/likeRepository.js';
 import * as repostRepository from '../repositories/repostRepository.js';
 import userRepository from '../repositories/userRepository.js';
+import * as postUtils from '../utils/postUtils.js';
+import * as repostUtils from '../utils/repostUtils.js';
 import connection from '../database/connection.js';
 
 function extractHashtags(text) {
@@ -31,41 +33,6 @@ async function handleHashtags(text, postId) {
   const hashtagsIds = hashtagsInDb.map((h) => h.id);
   await hashtagPostRepository.insertMany({ postId, hashtagsIds });
   return hashtagsIds;
-}
-
-async function insertLikesInPostArray(posts) {
-  const postsIds = posts.map((post) => post.id);
-  const likes = await likeRepository.findByPostIds(postsIds);
-  if(!likes) return posts;
-  return posts.map((post) => {
-    const thisPostLikes = likes.filter((like) => like.postId === post.id);
-
-    return { ...post, likes: thisPostLikes };
-  });
-}
-
-async function insertRepostCountInPostArray(posts) {
-  const postsIds = posts.map((post) => post.id);
-  const repostCounts = await repostRepository.countByPostIds(postsIds);
-  if(!repostCounts) return posts;
-  return posts.map((post) => {
-    const thisPostRepostCount = repostCounts.find((r) => r.postId === post.id);
-
-    return { 
-      ...post,
-      repostCount: thisPostRepostCount || {
-        postId: post.id,
-        count: 0,
-      },
-    };
-  });
-}
-
-export async function addPostActionsInfo(posts) {
-  let postsWithInfo = await insertLikesInPostArray(posts);
-  postsWithInfo = await insertRepostCountInPostArray(postsWithInfo);
-
-  return postsWithInfo;
 }
 
 export async function create(req, res) {
@@ -142,10 +109,14 @@ export async function getPosts(req, res) {
       return array;
     });
 
-    all = await addPostActionsInfo(all);
+    all = await postUtils.addPostActionsInfo(all);
+
+    const reposts = await repostUtils.getReposts();
+    all = [...all, ...reposts].sort((a, b) => b.id - a.id);
 
     res.send(all);
   } catch (err) {
+    console.error(err);
     res.status(500).send(err.message);
   }
 }
@@ -180,7 +151,7 @@ export async function getPostsById(req, res) {
       return array;
     });
 
-    all = await addPostActionsInfo(all);
+    all = await postUtils.addPostActionsInfo(all);
 
     return res.send(all);
   } catch (err) {
