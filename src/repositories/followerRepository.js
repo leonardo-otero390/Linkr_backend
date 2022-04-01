@@ -38,8 +38,6 @@ async function getFollows(followerId) {
   return result.rows;
 }
 
-
-
 const followerRepository = { insertFollower, getFollows,removeFollow };
 
 export default followerRepository;

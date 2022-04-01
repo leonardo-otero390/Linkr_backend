@@ -22,7 +22,6 @@ export async function insert({
 }
 
 export async function remove(id) {
-  // Deleting post dependents
   await connection.query(`DELETE FROM likes WHERE "postId"=$1`, [id]);
   await connection.query(`DELETE FROM "hashtagsPosts" WHERE "postId"=$1`, [id]);
   await connection.query(`DELETE FROM comments WHERE "postId"=$1`, [id]);
@@ -36,12 +35,29 @@ export async function get(id) {
     id,
   ]);
 
-  if (result.rowCount === 0) return null;
+  if (!result.rowCount) return null;
   return result.rows[0];
 }
 
+export async function findManyByAuthorIds(ids) {
+  const result = await connection.query(
+    `
+    SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",
+    p."linkImage", u.name, u."pictureUrl"
+    FROM posts p
+    JOIN users u ON p."authorId" = u.id
+    WHERE "authorId" IN (${ids})
+    ORDER BY p.id DESC
+    LIMIT 20;
+    `
+  );
+  if (!result.rowCount) return null;
+  return result.rows;
+}
+
 export async function findManyByUserId(userId) {
-  const result = await connection.query(`
+  const result = await connection.query(
+    `
   SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",
   p."linkDescription",p."linkImage", u.name, u."pictureUrl"
   FROM posts p

@@ -13,6 +13,7 @@ PostsRoute.post(
   '/posts',
   validateSchema(postSchemas.newPost),
   validateAuth,
+
   postController.create
 );
 PostsRoute.delete('/posts/:id', validateAuth, postController.remove);

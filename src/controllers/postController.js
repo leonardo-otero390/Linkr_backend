@@ -5,8 +5,8 @@ import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js
 import * as likeRepository from '../repositories/likeRepository.js';
 import * as repostRepository from '../repositories/repostRepository.js';
 import userRepository from '../repositories/userRepository.js';
+import followerRepository from '../repositories/followerRepository.js';
 import * as postUtils from '../utils/postUtils.js';
-import connection from '../database/connection.js';
 
 function extractHashtags(text) {
   const hashtags = text.match(/#\w+/g);
@@ -88,64 +88,42 @@ export async function remove(req, res) {
 }
 
 export async function getPosts(req, res) {
+  const { userId } = res.locals;
   try {
-    const posts = await connection.query(
-      'SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id ORDER BY p.id DESC LIMIT 20;'
-    );
+    const follows = await followerRepository.getFollows(userId);
+    if (!follows.length)
+      return res
+        .status(404)
+        .send("You don't follow anyone yet. Search for new friends!");
+    const followedIds = follows.map((follow) => follow.followedId);
+    const posts = await postRepository.findManyByAuthorIds([
+      userId,
+      ...followedIds,
+    ]);
+    if (!posts) return res.status(404).send('No posts found from your friends');
+    const result = await postUtils.addPostActionsInfo(posts);
 
-    const hashtagsPosts = await connection.query(
-      'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
-    );
-
-    let all = posts.rows.map((p) => {
-      const array = {
-        ...p,
-        hashtags: hashtagsPosts.rows.filter((h) => p.id === h.postId),
-      };
-
-      array.hashtags = array.hashtags.map((h) => h.name);
-
-      return array;
-    });
-
-    all = await postUtils.addPostActionsInfo(all);
-
-    res.send(all);
+   return res.send(result);
   } catch (err) {
     console.error(err);
-    res.status(500).send(err.message);
+    return res.status(500).send(err.message);
   }
 }
 
 export async function getPostsByUserId(req, res) {
   const userId = Number(req.params.id);
-  if(Number.isNaN(userId)) return res.status(422).send('User id must be a number');
+  if (Number.isNaN(userId))
+    return res.status(422).send('User id must be a number');
 
   try {
     const user = await userRepository.find(userId);
     if (!user) return res.status(404).send('User not found');
-    
 
     const posts = await postRepository.findManyByUserId(userId);
+    if (!posts) return res.status(404).send('No posts found');
 
-    const hashtagsPosts = await connection.query(
-      'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
-    );
-
-    let all = posts.map((p) => {
-      const array = {
-        ...p,
-        hashtags: hashtagsPosts.rows.filter((h) => p.id === h.postId),
-      };
-
-      array.hashtags = array.hashtags.map((h) => h.name);
-
-      return array;
-    });
-
-    all = await postUtils.addPostActionsInfo(all);
-
-    return res.send(all);
+    const result = await postUtils.addPostActionsInfo(posts);
+    return res.send(result);
   } catch (err) {
     console.error(err);
     return res.status(500).send(err.message);

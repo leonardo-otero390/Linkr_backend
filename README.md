@@ -133,6 +133,45 @@ and array like this
     "likes": [],
     "hashtags": []
   },
+]
+```
+
+- count is the number of mentions
+
+</details>
+
+<details>
+    <summary>
+        <strong>GET</strong> /posts
+    </summary>
+
+- it returns status <strong>404</strong> if there are no follows or posts of follows
+
+- it returns status <strong>200</strong> for success
+
+and array like this
+
+```json
+[
+  {
+    "id": 3,
+    "link": "https://www.google.com/",
+    "text": "",
+    "authorId": 1,
+    "linkTitle": "Google",
+    "linkDescription": "Link doesn't have a description",
+    "linkImage": "/images/branding/googleg/1x/googleg_standard_color_128dp.png",
+    "name": "cat",
+    "pictureUrl": "https://http.cat/411.jpg",
+    "likes": [
+      {
+        "postId": 1,
+        "userId": 2,
+        "userName": "simpson"
+      }
+    ]
+  },
+]
 ```
 
 </details>
