@@ -6,7 +6,6 @@ import * as likeRepository from '../repositories/likeRepository.js';
 import * as repostRepository from '../repositories/repostRepository.js';
 import userRepository from '../repositories/userRepository.js';
 import * as postUtils from '../utils/postUtils.js';
-import * as repostUtils from '../utils/repostUtils.js';
 import connection from '../database/connection.js';
 
 function extractHashtags(text) {
