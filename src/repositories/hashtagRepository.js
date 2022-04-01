@@ -16,6 +16,10 @@ export async function listTopHashtags(limit) {
 }
 
 export async function findManyByName(names) {
+  if (names === null || names.length === 0) {
+    return [];
+  }
+
   const query = sqlString.escape(names);
   const result = await connection.query(
     `SELECT * FROM hashtags WHERE name IN (${query});`
@@ -25,6 +29,10 @@ export async function findManyByName(names) {
 }
 
 export async function insertMany(names) {
+  if (names === null || names.length === 0) {
+    return [];
+  }
+
   const stringNames = sqlString.escape(names);
   const query = stringNames.replace(/, /g, '),(');
   const result = await connection.query(
