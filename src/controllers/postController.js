@@ -7,6 +7,7 @@ import * as repostRepository from '../repositories/repostRepository.js';
 import userRepository from '../repositories/userRepository.js';
 import followerRepository from '../repositories/followerRepository.js';
 import * as postUtils from '../utils/postUtils.js';
+import * as repostUtils from '../utils/repostUtils.js';
 
 function extractHashtags(text) {
   const hashtags = text.match(/#\w+/g);
@@ -101,7 +102,14 @@ export async function getPosts(req, res) {
       ...followedIds,
     ]);
     if (!posts) return res.status(404).send('No posts found from your friends');
-    const result = await postUtils.addPostActionsInfo(posts);
+    let result = await postUtils.addPostActionsInfo(posts);
+
+    const reposts = await repostUtils.getReposts(followedIds);
+    if(reposts) {
+      result = [...result, ...reposts].sort((a, b) => b.id - a.id);
+    }
+
+    console.log(result);
 
    return res.send(result);
   } catch (err) {

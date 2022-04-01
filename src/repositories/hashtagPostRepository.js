@@ -24,6 +24,10 @@ export async function findPostsByHashtag(name) {
 }
 
 export async function findHashtagsNamesByPostsIds(ids) {
+  if (ids === null || ids.length === 0) {
+    return [];
+  }
+
   const result = await connection.query(
     `SELECT hashtags.name FROM "hashtags"
     JOIN "hashtagsPosts" ON "hashtags"."id" = "hashtagsPosts"."hashtagId"

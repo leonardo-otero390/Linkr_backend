@@ -40,6 +40,10 @@ export async function get(id) {
 }
 
 export async function findManyByAuthorIds(ids) {
+  if (ids === null || ids.length === 0) {
+    return null;
+  }
+
   const result = await connection.query(
     `
     SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",
