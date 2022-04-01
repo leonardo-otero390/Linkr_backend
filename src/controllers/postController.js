@@ -32,6 +32,34 @@ async function handleHashtags(text, postId) {
   return hashtagsIds;
 }
 
+function compareHashtags(oldHashtags, newHashtags) {
+  const hashtable = {};
+  const hashtagsToDelete = [];
+  const hashtagsToAdd = [];
+
+  oldHashtags.forEach((h) => {hashtable[h] = true});
+
+  newHashtags.forEach((h) => {
+    const isInOlds = hashtable[h];
+
+    if (isInOlds) {
+      hashtable[h] = false;
+    } else {
+      hashtagsToAdd.push(h);
+    }
+  });
+
+  const hashtableValues = Object.values(hashtable);
+
+  hashtableValues.forEach((v, i) => {
+    if (v) {
+      hashtagsToDelete.push(oldHashtags[i]);
+    }
+  });
+
+  return [hashtagsToDelete, hashtagsToAdd];
+}
+
 export async function create(req, res) {
   const { userId } = res.locals;
   const { text, link } = req.body;
@@ -106,11 +134,21 @@ export async function edit(req, res) {
     if(postToEdit.authorId !== userId) {
       return res.status(401).send('This post is not yours');
     }
+
+    if(postToEdit.text === newText) {
+      return res.status(404).send('There was no change');
+    }
   
     if (newText.includes('#')) {
-      const hashtags =  await handleHashtags(newText, id);
-      console.log(hashtags)
-      await hashtagPostRepository.removeUnsedHashtags(id, hashtags);
+/*       const hashtags =  await handleHashtags(newText, id); */
+      const oldHashtags = await hashtagPostRepository.findHashtagsNamesByPostsIds(id);
+
+      const oldHashtagsNames = oldHashtags.map(({name}) => name);
+      const newHashtagsNames = extractHashtags(newText);
+
+      const [hashtagsToDelete, hashtagsToAdd] = compareHashtags(oldHashtagsNames, newHashtagsNames);
+      console.log(hashtagsToDelete,hashtagsToAdd);
+/*       await hashtagPostRepository.removeUnsedHashtags(id, hashtags); */
     }
 
     await postRepository.edit(id, newText);
