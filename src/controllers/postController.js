@@ -132,7 +132,7 @@ export async function getPostsByUserId(req, res) {
       'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
     );
 
-    let all = posts.rows.map((p) => {
+    let all = posts.map((p) => {
       const array = {
         ...p,
         hashtags: hashtagsPosts.rows.filter((h) => p.id === h.postId),

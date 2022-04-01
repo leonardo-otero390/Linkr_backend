@@ -1,6 +1,10 @@
 import connection from '../database/connection.js';
 
 export async function findByUserIds(ids) {
+  if (ids === null || ids.length === 0) {
+    return [];
+  }
+
   const result = await connection.query(
     `SELECT
       "postId", "userId", name as "userName"
@@ -12,6 +16,10 @@ export async function findByUserIds(ids) {
 }
 
 export async function countByPostIds(ids) {
+  if (ids === null || ids.length === 0) {
+    return [];
+  }
+
   const result = await connection.query(
     `SELECT
       "postId", COUNT("postId")

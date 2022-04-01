@@ -4,7 +4,7 @@ import * as repostRepository from '../repositories/repostRepository.js';
 async function insertLikesInPostArray(posts) {
   const postsIds = posts.map((post) => post.id);
   const likes = await likeRepository.findByPostIds(postsIds);
-  if(!likes) return posts;
+  if(!likes) return posts.map(p => ({...p, likes: []}));
   return posts.map((post) => {
     const thisPostLikes = likes.filter((like) => like.postId === post.id);
 
@@ -32,6 +32,6 @@ async function insertRepostCountInPostArray(posts) {
 export async function addPostActionsInfo(posts) {
   let postsWithInfo = await insertLikesInPostArray(posts);
   postsWithInfo = await insertRepostCountInPostArray(postsWithInfo);
-
+  
   return postsWithInfo;
 }
