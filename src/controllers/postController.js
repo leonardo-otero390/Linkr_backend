@@ -97,9 +97,11 @@ export async function insertLikesInPostArray(posts) {
 }
 
 export async function getPosts(req, res) {
+  const { page, limit } = res.locals;
+
   try {
     const posts = await connection.query(
-      'SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id ORDER BY p.id DESC LIMIT 20;'
+      `SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id ORDER BY p.id DESC ${limit} ${page};`
     );
 
     const hashtagsPosts = await connection.query(
@@ -128,6 +130,7 @@ export async function getPosts(req, res) {
 export async function getPostsById(req, res) {
   try {
     const userId = req.params.id;
+    const { page, limit } = res.locals;
 
     const valideIds = await connection.query(
       'SELECT id FROM users WHERE id=$1',
@@ -136,7 +139,7 @@ export async function getPostsById(req, res) {
     if (valideIds.rowCount === 0) return res.sendStatus(404);
 
     const posts = await connection.query(
-      'SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id WHERE p."authorId"=$1 ORDER BY p.id DESC LIMIT 20;',
+      `SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id WHERE p."authorId"=$1 ORDER BY p.id DESC ${limit} ${page}`,
       [userId]
     );
 
@@ -179,7 +182,6 @@ export async function toggleLikePost(req, res) {
 
     return res.sendStatus(200);
   } catch (error) {
-    console.error(error);
     return res.sendStatus(500);
   }
 }
