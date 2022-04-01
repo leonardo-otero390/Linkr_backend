@@ -3,8 +3,10 @@ import * as postRepository from '../repositories/postRepository.js';
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
 import * as likeRepository from '../repositories/likeRepository.js';
+import * as repostRepository from '../repositories/repostRepository.js';
 import userRepository from '../repositories/userRepository.js';
 import followerRepository from '../repositories/followerRepository.js';
+import * as postUtils from '../utils/postUtils.js';
 
 function extractHashtags(text) {
   const hashtags = text.match(/#\w+/g);
@@ -85,17 +87,6 @@ export async function remove(req, res) {
   }
 }
 
-export async function insertLikesInPostArray(posts) {
-  const postsIds = posts.map((post) => post.id);
-  const likes = await likeRepository.findByPostIds(postsIds);
-  if (!likes) return posts;
-  return posts.map((post) => {
-    const thisPostLikes = likes.filter((like) => like.postId === post.id);
-
-    return { ...post, likes: thisPostLikes };
-  });
-}
-
 export async function getPosts(req, res) {
   const { userId } = res.locals;
   try {
@@ -110,9 +101,11 @@ export async function getPosts(req, res) {
       ...followedIds,
     ]);
     if (!posts) return res.status(404).send('No posts found from your friends');
-    const result = await insertLikesInPostArray(posts);
-    return res.send(result);
+    const result = await postUtils.addPostActionsInfo(posts);
+
+   return res.send(result);
   } catch (err) {
+    console.error(err);
     return res.status(500).send(err.message);
   }
 }
@@ -127,12 +120,12 @@ export async function getPostsByUserId(req, res) {
     if (!user) return res.status(404).send('User not found');
 
     const posts = await postRepository.findManyByUserId(userId);
-    if (!posts) return res.status(404).send('This user has no posts');
+    if (!posts) return res.status(404).send('No posts found');
 
-    const objectResult = await insertLikesInPostArray(posts);
-
-    return res.send(objectResult);
+    const result = await postUtils.addPostActionsInfo(posts);
+    return res.send(result);
   } catch (err) {
+    console.error(err);
     return res.status(500).send(err.message);
   }
 }
@@ -150,6 +143,27 @@ export async function toggleLikePost(req, res) {
     }
 
     await likeRepository.toggle(userId, id);
+
+    return res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function repost(req, res) {
+  const { id } = req.params;
+
+  const { userId } = res.locals;
+
+  try {
+    const post = await postRepository.get(id);
+
+    if (!post) {
+      return res.status(422).send("This post doesn't exist");
+    }
+
+    await repostRepository.insert(userId, id);
 
     return res.sendStatus(200);
   } catch (error) {

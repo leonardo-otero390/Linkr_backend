@@ -24,7 +24,9 @@ export async function insert({
 export async function remove(id) {
   await connection.query(`DELETE FROM likes WHERE "postId"=$1`, [id]);
   await connection.query(`DELETE FROM "hashtagsPosts" WHERE "postId"=$1`, [id]);
-
+  await connection.query(`DELETE FROM comments WHERE "postId"=$1`, [id]);
+  await connection.query(`DELETE FROM reposts WHERE "postId"=$1`, [id]);
+  
   await connection.query(`DELETE FROM posts WHERE id=$1`, [id]);
 }
 
@@ -63,9 +65,7 @@ export async function findManyByUserId(userId) {
   WHERE p."authorId"=$1 
   ORDER BY p.id DESC 
   LIMIT 20;
-  `,
-    [userId]
-  );
-  if (!result.rowCount) return null;
+  `, [userId]);
+  
   return result.rows;
 }
