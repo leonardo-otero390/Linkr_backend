@@ -1,6 +1,6 @@
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
-import * as postController from './postController.js';
+import * as postUtils from '../utils/postUtils.js';
 
 async function insertHashtagsInPostArray(posts) {
   const postsIds = posts.map((post) => post.id);
@@ -34,7 +34,7 @@ async function organizePostObjects(posts) {
     };
     return object;
   });
-  arr = await postController.addPostActionsInfo(arr);
+  arr = await postUtils.addPostActionsInfo(arr);
   arr = await insertHashtagsInPostArray(arr);
   return arr;
 }
@@ -57,6 +57,7 @@ export async function getPostsByHashtag(req, res) {
     const result = await organizePostObjects(posts);
     return res.status(200).send(result);
   } catch (error) {
+    console.error(error);
     return res.status(500).send(error.message);
   }
 }
