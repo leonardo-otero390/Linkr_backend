@@ -112,9 +112,9 @@ and array like this
         <strong>GET</strong> /hashtags/HASHTAG/posts
     </summary>
 
-- it returns status <strong>200</strong> for success
-
 - change HASHTAG to the hashtag you're looking for
+
+- it returns status <strong>200</strong> for success
 
 and array like this
 
@@ -174,7 +174,46 @@ and array like this
 ]
 ```
 
-- count is the number of mentions
+</details>
+
+<details>
+    <summary>
+        <strong>PUT</strong> /users/USERID/follow
+    </summary>
+
+- it returns status <strong>200</strong> for success
+
+- change USERID to the user id you're following or unfollowing
+
+- it return status <strong>400</strong> if USERID is not a number or if is the same user requesting
+
+- it return status <strong>404</strong> if there isn't a user with USERID
+
+</details>
+
+<details>
+    <summary>
+        <strong>GET</strong> /users/follows
+    </summary>
+
+- it returns status <strong>200</strong> for success
+
+and array like this
+
+```json
+[
+  {
+    "id": 5,
+    "followedId": 1,
+    "followerId": 2
+  }
+  {
+    "id": 6,
+    "followedId": 5,
+    "followerId": 2
+  }
+]
+```
 
 </details>
 
