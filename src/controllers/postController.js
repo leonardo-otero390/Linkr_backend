@@ -118,20 +118,16 @@ export async function getPosts(req, res) {
   }
 }
 
-export async function getPostsById(req, res) {
+export async function getPostsByUserId(req, res) {
+  const userId = Number(req.params.id);
+  if(Number.isNaN(userId)) return res.status(422).send('User id must be a number');
+
   try {
-    const userId = req.params.id;
+    const user = await userRepository.find(userId);
+    if (!user) return res.status(404).send('User not found');
+    
 
-    const valideIds = await connection.query(
-      'SELECT id FROM users WHERE id=$1',
-      [userId]
-    );
-    if (valideIds.rowCount === 0) return res.sendStatus(404);
-
-    const posts = await connection.query(
-      'SELECT p.id, p.link, p.text, p."authorId",p."linkTitle",p."linkDescription",p."linkImage", u.name, u."pictureUrl" FROM posts p JOIN users u ON p."authorId"=u.id WHERE p."authorId"=$1 ORDER BY p.id DESC LIMIT 20;',
-      [userId]
-    );
+    const posts = await postRepository.findManyByUserId(userId);
 
     const hashtagsPosts = await connection.query(
       'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
@@ -152,6 +148,7 @@ export async function getPostsById(req, res) {
 
     return res.send(all);
   } catch (err) {
+    console.error(err);
     return res.status(500).send(err.message);
   }
 }
