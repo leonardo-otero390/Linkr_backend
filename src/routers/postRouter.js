@@ -17,5 +17,6 @@ PostsRoute.post(
 );
 PostsRoute.delete('/posts/:id', validateAuth, postController.remove);
 PostsRoute.post("/posts/:id/toggle-like", validateAuth, postController.toggleLikePost);
+PostsRoute.post('/posts/:id/repost', validateAuth, postController.repost);
 
 export default PostsRoute;

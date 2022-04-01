@@ -3,7 +3,9 @@ import * as postRepository from '../repositories/postRepository.js';
 import * as hashtagRepository from '../repositories/hashtagRepository.js';
 import * as hashtagPostRepository from '../repositories/hashtagPostRepository.js';
 import * as likeRepository from '../repositories/likeRepository.js';
+import * as repostRepository from '../repositories/repostRepository.js';
 import userRepository from '../repositories/userRepository.js';
+import * as postUtils from '../utils/postUtils.js';
 import connection from '../database/connection.js';
 
 function extractHashtags(text) {
@@ -85,17 +87,6 @@ export async function remove(req, res) {
   }
 }
 
-export async function insertLikesInPostArray(posts) {
-  const postsIds = posts.map((post) => post.id);
-  const likes = await likeRepository.findByPostIds(postsIds);
-  if (!likes) return posts;
-  return posts.map((post) => {
-    const thisPostLikes = likes.filter((like) => like.postId === post.id);
-
-    return { ...post, likes: thisPostLikes };
-  });
-}
-
 export async function getPosts(req, res) {
   try {
     const posts = await connection.query(
@@ -117,10 +108,11 @@ export async function getPosts(req, res) {
       return array;
     });
 
-    all = await insertLikesInPostArray(all);
+    all = await postUtils.addPostActionsInfo(all);
 
     res.send(all);
   } catch (err) {
+    console.error(err);
     res.status(500).send(err.message);
   }
 }
@@ -135,12 +127,27 @@ export async function getPostsByUserId(req, res) {
     
 
     const posts = await postRepository.findManyByUserId(userId);
-    if (!posts) return res.status(404).send('This user has no posts');
 
-    const objectResult = await insertLikesInPostArray(posts);
+    const hashtagsPosts = await connection.query(
+      'SELECT hp.*, h.name FROM "hashtagsPosts" hp JOIN hashtags h ON hp."hashtagId"=h.id'
+    );
 
-    return res.send(objectResult);
+    let all = posts.map((p) => {
+      const array = {
+        ...p,
+        hashtags: hashtagsPosts.rows.filter((h) => p.id === h.postId),
+      };
+
+      array.hashtags = array.hashtags.map((h) => h.name);
+
+      return array;
+    });
+
+    all = await postUtils.addPostActionsInfo(all);
+
+    return res.send(all);
   } catch (err) {
+    console.error(err);
     return res.status(500).send(err.message);
   }
 }
@@ -158,6 +165,27 @@ export async function toggleLikePost(req, res) {
     }
 
     await likeRepository.toggle(userId, id);
+
+    return res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+}
+
+export async function repost(req, res) {
+  const { id } = req.params;
+
+  const { userId } = res.locals;
+
+  try {
+    const post = await postRepository.get(id);
+
+    if (!post) {
+      return res.status(422).send("This post doesn't exist");
+    }
+
+    await repostRepository.insert(userId, id);
 
     return res.sendStatus(200);
   } catch (error) {
