@@ -26,7 +26,7 @@ export async function remove(id) {
   await connection.query(`DELETE FROM "hashtagsPosts" WHERE "postId"=$1`, [id]);
   await connection.query(`DELETE FROM comments WHERE "postId"=$1`, [id]);
   await connection.query(`DELETE FROM reposts WHERE "postId"=$1`, [id]);
-  
+
   await connection.query(`DELETE FROM posts WHERE id=$1`, [id]);
 }
 
@@ -52,7 +52,7 @@ export async function findManyByAuthorIds(ids) {
     JOIN users u ON p."authorId" = u.id
     WHERE "authorId" IN (${ids})
     ORDER BY p.id DESC
-    LIMIT 20;
+  ;
     `
   );
   if (!result.rowCount) return null;
@@ -68,8 +68,10 @@ export async function findManyByUserId(userId) {
   JOIN users u ON p."authorId"=u.id
   WHERE p."authorId"=$1 
   ORDER BY p.id DESC 
-  LIMIT 20;
-  `, [userId]);
-  
+  ;
+  `,
+    [userId]
+  );
+
   return result.rows;
 }
