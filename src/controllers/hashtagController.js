@@ -34,6 +34,10 @@ async function organizePostObjects(posts) {
     };
     return object;
   });
+
+  // Most recent posts must appear earlier
+  arr.sort((a, b) => b.id - a.id);
+  
   arr = await postUtils.addPostActionsInfo(arr);
   arr = await insertHashtagsInPostArray(arr);
   return arr;
