@@ -41,7 +41,7 @@ export async function get(id) {
 
 export async function findManyByAuthorIds(ids) {
   if (ids === null || ids.length === 0) {
-    return null;
+    return [];
   }
 
   const result = await connection.query(
@@ -55,7 +55,7 @@ export async function findManyByAuthorIds(ids) {
   ;
     `
   );
-  if (!result.rowCount) return null;
+  
   return result.rows;
 }
 

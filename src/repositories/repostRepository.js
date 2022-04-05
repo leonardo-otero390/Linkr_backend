@@ -1,8 +1,8 @@
 import connection from '../database/connection.js';
 
-export async function findManyByUserIds(followedIds) {
-  if (followedIds === null || followedIds.length === 0) {
-    return null;
+export async function findManyByUserIds(ids) {
+  if (ids === null || ids.length === 0) {
+    return [];
   }
 
   const result = await connection.query(
@@ -13,11 +13,15 @@ export async function findManyByUserIds(followedIds) {
       JOIN users u ON p."authorId"=u.id
       JOIN reposts r ON p.id=r."postId"
       JOIN users s ON r."userId"=s.id
-    WHERE s.id IN (${followedIds})
-    ORDER BY p.id DESC LIMIT 20;`
+    WHERE s.id IN (${ids})
+    ORDER BY p.id DESC;`
   );
 
   return result.rows;
+}
+
+export async function findManyByUserId(id) {
+  return findManyByUserIds([id]);
 }
 
 export async function countByPostIds(ids) {
