@@ -127,17 +127,6 @@ export async function edit(req, res) {
   }
 }
 
-export async function insertLikesInPostArray(posts) {
-  const postsIds = posts.map((post) => post.id);
-  const likes = await likeRepository.findByPostIds(postsIds);
-  if(!likes) return posts;
-  return posts.map((post) => {
-    const thisPostLikes = likes.filter((like) => like.postId === post.id);
-
-    return { ...post, likes: thisPostLikes };
-  });
-}
-
 export async function getPosts(req, res) {
   const { userId } = res.locals;
   try {
