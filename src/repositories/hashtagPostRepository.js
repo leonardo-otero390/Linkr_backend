@@ -36,3 +36,25 @@ export async function findHashtagsNamesByPostsIds(ids) {
   if (!result.rowCount) return false;
   return result.rows;
 }
+
+export async function removeByPostId(postId) {
+  const result = await connection.query(`
+  DELETE FROM "hashtagsPosts" AS "hP"
+  WHERE "hP"."postId" = $1
+  RETURNING "hP"."hashtagId"
+  `, [postId]);
+
+  return result.rows;
+}
+
+export async function checkAmountOfRows(postId) {
+  const result = await connection.query(`
+  DELETE FROM "hashtagsPosts" AS "hP"
+  WHERE "hP"."postId" = $1
+  RETURNING "hP"."hashtagId"
+  `, [postId]);
+
+  return result.rows;
+}
+
+

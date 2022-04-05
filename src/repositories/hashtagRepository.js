@@ -42,3 +42,10 @@ export async function insertMany(names) {
   if (!result.rowCount) return false;
   return result.rows;
 }
+
+export async function removeById(hashtagsId) {
+  await connection.query(`
+    DELETE FROM hashtags AS h
+    WHERE h.id = $1
+  `, [hashtagsId]);
+ }

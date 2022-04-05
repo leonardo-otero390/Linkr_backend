@@ -87,6 +87,45 @@ export async function remove(req, res) {
   }
 }
 
+export async function edit(req, res) {
+  try {
+    const { id } = req.params;
+    const { userId } = res.locals;
+    const { newText } = req.body;
+  
+    const postToEdit = await postRepository.get(id);
+  
+    if(!postToEdit) {
+      return res.status(422).send('There is no post with this id');
+    }
+  
+    if(postToEdit.authorId !== userId) {
+      return res.status(401).send('This post is not yours');
+    }
+
+    if(postToEdit.text === newText) {
+      return res.status(400).send('There was no change');
+    }
+  
+    await postRepository.edit(id, newText);
+
+    const hashtagsDeletedIds = await hashtagPostRepository.removeByPostId(id);
+    
+    hashtagsDeletedIds.forEach( async ({hashtagId}) => {
+      const amount = await hashtagPostRepository.checkAmountOfRows(hashtagId);
+
+      if (amount === 1) {
+        await hashtagRepository.removeById(hashtagId);  
+      };
+    })
+    await handleHashtags(newText, id);
+
+    return res.status(200).send(newText);
+  } catch (error) {
+    return res.status(500).send('There was an internal server error');
+  }
+}
+
 export async function getPosts(req, res) {
   const { userId } = res.locals;
   try {
