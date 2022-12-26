@@ -7,7 +7,6 @@ import * as repostRepository from '../repositories/repostRepository.js';
 import userRepository from '../repositories/userRepository.js';
 import followerRepository from '../repositories/followerRepository.js';
 import * as postUtils from '../utils/postUtils.js';
-import * as repostUtils from '../utils/repostUtils.js';
 
 function extractHashtags(text) {
   const hashtags = text.match(/#\w+/g);
@@ -92,26 +91,30 @@ export async function getPosts(req, res) {
   const { userId } = res.locals;
   try {
     const follows = await followerRepository.getFollows(userId);
-    if (!follows.length)
-      return res
-        .status(404)
-        .send("You don't follow anyone yet. Search for new friends!");
+    
     const followedIds = follows.map((follow) => follow.followedId);
     const posts = await postRepository.findManyByAuthorIds([
       userId,
       ...followedIds,
     ]);
-    if (!posts) return res.status(404).send('No posts found from your friends');
-    let result = await postUtils.addPostActionsInfo(posts);
 
-    const reposts = await repostUtils.getReposts(followedIds);
-    if(reposts) {
-      result = [...result, ...reposts].sort((a, b) => b.id - a.id);
+    const reposts = await repostRepository
+      .findManyByUserIds([userId, ...followedIds]);
+
+    let result = [...posts, ...reposts].sort((a, b) => b.id - a.id);
+
+    if (result.length === 0) {
+      if (followedIds.length === 0) {
+        return res
+          .status(404)
+          .send("You don't follow anyone yet. Search for new friends!");
+      }
+      return res.status(404).send('No posts found from your friends');
     }
 
-    console.log(result);
-
-   return res.send(result);
+    result = await postUtils.addPostActionsInfo(result);
+    
+    return res.send(result);
   } catch (err) {
     console.error(err);
     return res.status(500).send(err.message);
@@ -128,9 +131,14 @@ export async function getPostsByUserId(req, res) {
     if (!user) return res.status(404).send('User not found');
 
     const posts = await postRepository.findManyByUserId(userId);
-    if (!posts) return res.status(404).send('No posts found');
+    
+    const reposts = await repostRepository.findManyByUserId(userId);
+    
+    let result = [...posts, ...reposts].sort((a, b) => b.id - a.id);
 
-    const result = await postUtils.addPostActionsInfo(posts);
+    if (result.length === 0) return res.status(404).send('No posts found');
+
+    result = await postUtils.addPostActionsInfo(result);
     return res.send(result);
   } catch (err) {
     console.error(err);
